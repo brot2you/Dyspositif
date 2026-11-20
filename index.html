@@ -1,0 +1,2243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Multitool — by BROT2YOU</title>
+<meta name="description" content="La boîte à outils du quotidien pour les élèves DYS et TDAH : lire, comprendre les consignes, s'organiser, se concentrer.">
+<meta name="theme-color" content="#24463C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@500;600;700&family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mat:#2B5246; --mat2:#22433A;
+  --ink:#1E2226; --ink2:#575E66; --line:#D9D1C3;
+  --paper:#F6F1E7;
+  --h:#B5212B; --h-dark:#7E141C; --h-txt:#FFFFFF;
+  --rf:'Lexend',sans-serif; --rs:20px; --rlh:1.7; --rls:.02em; --rws:.12em; --rbg:#F6F1E7;
+  --c0:#1F5FAD; --c1:#C62828;
+  --steel:linear-gradient(180deg,#F5F6F7 0%,#DEE1E4 38%,#BDC2C7 56%,#E6E8EA 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background-color:var(--mat);
+  background-image:
+    linear-gradient(rgba(255,255,255,.13) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.13) 1px,transparent 1px),
+    linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:100px 100px,100px 100px,20px 20px,20px 20px;
+  background-attachment:fixed;
+  font-family:'Lexend',sans-serif;color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid #F2B33D;outline-offset:2px}
+[hidden]{display:none!important}
+.ic{display:inline-flex;width:22px;height:22px;flex:0 0 auto}
+.ic svg{width:100%;height:100%}
+
+/* ---------- barre du haut (bord de tapis gradué) */
+#bar{
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;
+  padding:10px 14px 18px;background-color:var(--mat2);
+  background-image:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.55) 0 1px,transparent 1px 50px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.35) 0 1px,transparent 1px 10px);
+  background-size:100% 10px,100% 5px;background-repeat:no-repeat;background-position:left bottom,left bottom;
+  box-shadow:0 2px 0 rgba(0,0,0,.25);
+}
+.marque{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.22em;color:#F3EFE6;font-size:24px;white-space:nowrap}
+.marque small{font-weight:500;letter-spacing:.14em;opacity:.55;font-size:12px;margin-left:8px}
+.bar-titre{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#F3EFE6;font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacer{flex:1}
+.icobtn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:46px;height:46px;padding:0 12px;
+  border-radius:8px;border:none;background:var(--steel);color:#30363C;
+  box-shadow:inset 0 1px 0 #fff,0 2px 0 rgba(0,0,0,.4);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;
+}
+.icobtn:active{transform:translateY(1px);box-shadow:inset 0 1px 0 #fff,0 1px 0 rgba(0,0,0,.4)}
+.icobtn .ic{width:20px;height:20px}
+.icobtn.chrono{color:var(--h-dark);font-variant-numeric:tabular-nums}
+.icobtn.chrono::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--h);box-shadow:0 0 0 2px rgba(181,33,43,.25)}
+
+main#view{padding:20px 14px 70px}
+
+/* ---------- le couteau */
+.couteau{display:flex;max-width:760px;margin:6px auto 0;align-items:stretch}
+.manche{
+  flex:0 0 68px;border-radius:34px;position:relative;z-index:3;
+  background:linear-gradient(90deg,rgba(0,0,0,.38),rgba(0,0,0,0) 26%,rgba(255,255,255,.3) 45%,rgba(255,255,255,0) 60%,rgba(0,0,0,.34)),var(--h);
+  box-shadow:0 8px 16px rgba(0,0,0,.4),inset 0 0 0 1px rgba(0,0,0,.25);
+  min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:22px 0;
+}
+.rivet{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#C9CED2 40%,#8D9399 75%,#6C7278);box-shadow:0 1px 1px rgba(0,0,0,.45)}
+.gravure{
+  writing-mode:vertical-rl;transform:rotate(180deg);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.32em;
+  text-transform:uppercase;color:rgba(255,255,255,.66);text-shadow:0 -1px 0 rgba(0,0,0,.4);font-size:19px;max-height:62%;overflow:hidden;white-space:nowrap
+}
+.plaque{width:30px;height:46px;border-radius:15px;background:var(--steel);display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;color:#5A6066;letter-spacing:.08em;writing-mode:vertical-rl;box-shadow:inset 0 1px 0 #fff,0 1px 1px rgba(0,0,0,.4)}
+.lames{flex:1;display:flex;flex-direction:column;gap:12px;margin-left:-32px;padding:16px 0;position:relative;z-index:2;min-width:0}
+.lame-w{filter:drop-shadow(0 3px 2px rgba(0,0,0,.38));animation:ouvrir .6s cubic-bezier(.2,.8,.25,1) both;transform-origin:left center;border-radius:4px}
+.lame-w:focus-within{outline:3px solid #F2B33D;outline-offset:3px}
+@keyframes ouvrir{from{transform:translateX(-55%) scaleX(.35);opacity:0}to{transform:none;opacity:1}}
+.lame{
+  width:100%;min-height:70px;display:flex;align-items:center;gap:14px;padding:10px 72px 10px 48px;border:none;text-align:left;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 1px,rgba(0,0,0,.025) 1px 3px),var(--steel);
+  color:#40464C;transition:transform .18s ease;
+}
+.lame:focus-visible{outline:none}
+.lame-w:hover .lame{transform:translateX(8px)}
+.lame:active{transform:translateX(12px)!important}
+.t0{clip-path:polygon(0 0,86% 0,100% 64%,97% 100%,0 100%)}
+.t1{clip-path:polygon(0 0,93% 0,100% 24%,100% 76%,93% 100%,0 100%)}
+.t2{border-radius:0 40px 40px 0;
+  background-image:repeating-linear-gradient(115deg,rgba(0,0,0,.1) 0 2px,transparent 2px 6px),repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 1px,rgba(0,0,0,.025) 1px 3px),var(--steel);
+  background-size:26% 100%,auto,auto;background-position:right center,0 0,0 0;background-repeat:no-repeat,repeat,no-repeat}
+.t3{clip-path:polygon(0 0,100% 0,100% 36%,92% 50%,100% 64%,100% 100%,0 100%)}
+.lame .ic{width:30px;height:30px;color:#4A5157;filter:drop-shadow(0 1px 0 rgba(255,255,255,.85))}
+.lame .nom{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:23px;letter-spacing:.1em;text-transform:uppercase;color:#3C4248;text-shadow:0 1px 0 rgba(255,255,255,.9),0 -1px 0 rgba(0,0,0,.14);line-height:1.1}
+.lame .sous{display:block;font-size:14px;color:#5B6269;margin-top:2px}
+.consigne-mat{max-width:760px;margin:16px auto 0;color:rgba(243,239,230,.75);font-size:14px;text-align:center}
+.boite{max-width:760px;margin:30px auto 0;color:#EAE5DA}
+.boite h2{font-family:'Barlow Condensed',sans-serif;letter-spacing:.18em;text-transform:uppercase;font-size:15px;font-weight:700;opacity:.75;margin:0 0 10px}
+.puces{display:flex;flex-wrap:wrap;gap:8px}
+.puce-lame{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.18);color:#F1ECE2;font-size:15px;min-height:44px}
+.puce-lame .ic{width:18px;height:18px}
+
+/* ---------- feuille de travail */
+.sheet{max-width:880px;margin:0 auto;background:var(--rbg);border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:26px 24px 32px;font-family:var(--rf);position:relative;font-size:17px;line-height:1.5}
+.sheet::before{content:'';position:absolute;left:0;right:0;top:0;height:6px;background:var(--h);border-radius:4px 4px 0 0}
+.titre{font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.07em;text-transform:uppercase;font-size:21px;margin:20px 0 8px;color:var(--ink)}
+.titre:first-child{margin-top:4px}
+.aide{color:var(--ink2);font-size:16px;margin:2px 0 14px;line-height:1.5}
+.note{font-size:14px;color:var(--ink2);border-left:4px solid var(--line);padding:6px 12px;margin:14px 0}
+.alerte{background:#FBE9D6;border:2px solid #E4A16A;border-radius:8px;padding:12px 14px;margin:10px 0;font-size:16px}
+.lisible{font-family:var(--rf);font-size:var(--rs);line-height:var(--rlh);letter-spacing:var(--rls);word-spacing:var(--rws)}
+.zone{position:relative;overflow:auto;max-height:62vh;padding:16px 18px;border:2px solid var(--line);border-radius:6px;background:rgba(255,255,255,.6);white-space:normal}
+textarea,input[type=text],input[type=date],select{font-family:var(--rf);font-size:18px;width:100%;padding:12px 14px;border:2px solid #CDC5B6;border-radius:6px;background:#fff;color:var(--ink)}
+textarea{resize:vertical;line-height:1.5}
+textarea.lisible{font-size:var(--rs);line-height:var(--rlh)}
+textarea:focus,input:focus,select:focus{border-color:var(--ink);outline:none;box-shadow:0 0 0 3px rgba(242,179,61,.6)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 18px;border-radius:7px;border:2px solid var(--ink);background:#fff;
+  font-family:'Lexend',sans-serif;font-weight:600;font-size:16px;color:var(--ink);box-shadow:0 3px 0 var(--ink);text-decoration:none}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn.prim{background:var(--h);color:var(--h-txt);border-color:var(--h-dark);box-shadow:0 3px 0 var(--h-dark)}
+.btn.petit{min-height:42px;padding:0 12px;font-size:14px}
+.btn.gros{min-height:66px;font-size:20px;padding:0 28px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn .ic{width:20px;height:20px}
+.rang{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.onglets{display:flex;gap:4px;border-bottom:2px solid var(--line);margin:-6px 0 18px;flex-wrap:wrap}
+.onglet{border:none;background:none;padding:12px 12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.07em;text-transform:uppercase;font-size:18px;color:var(--ink2);border-bottom:4px solid transparent;margin-bottom:-2px}
+.onglet.on{color:var(--ink);border-bottom-color:var(--h)}
+.choix{display:inline-flex;border:2px solid var(--ink);border-radius:7px;overflow:hidden;flex-wrap:wrap}
+.choix button{border:none;background:#fff;padding:8px 14px;min-height:44px;font-weight:600;font-size:15px}
+.choix button+button{border-left:2px solid var(--ink)}
+.choix button.on{background:var(--ink);color:#fff}
+.puce{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;min-height:44px;border-radius:6px;border:2px solid #CDC5B6;background:#fff;font-size:15px;font-weight:500}
+.puce.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.pastille{width:12px;height:12px;border-radius:3px;display:inline-block;flex:0 0 auto}
+.carte-item{background:#fff;border:2px solid var(--line);border-radius:8px;padding:14px 16px;margin:10px 0}
+.ligne-coche{display:flex;align-items:center;gap:14px;padding:12px 14px;border:2px solid var(--line);border-radius:8px;background:#fff;margin:8px 0;font-size:18px;width:100%;text-align:left;font-family:var(--rf)}
+.case{width:32px;height:32px;border:3px solid var(--ink);border-radius:6px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:#fff;color:transparent}
+.case .ic{width:20px;height:20px}
+.ligne-coche.fait .case{background:var(--h);border-color:var(--h-dark);color:var(--h-txt)}
+.ligne-coche.fait .txt{text-decoration:line-through;opacity:.5}
+.vide{padding:22px;border:2px dashed #CDC5B6;border-radius:8px;text-align:center;color:var(--ink2)}
+.lab{display:block;font-weight:600;margin:16px 0 6px;font-size:16px}
+input[type=range]{width:100%;accent-color:var(--h);height:32px}
+.bascule{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:16px;cursor:pointer}
+input.sw{-webkit-appearance:none;appearance:none;width:54px;height:32px;border-radius:16px;background:#C9C2B5;position:relative;flex:0 0 auto;transition:background .2s;cursor:pointer;margin:0;border:none}
+input.sw::after{content:'';position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.35);transition:left .2s}
+input.sw:checked{background:var(--h)}
+input.sw:checked::after{left:26px}
+.mini{width:42px;height:42px;border-radius:6px;border:2px solid #CDC5B6;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.mini .ic{width:18px;height:18px}
+.mini[disabled]{opacity:.3}
+.grille2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.echelle{display:flex;justify-content:space-between;font-size:13px;color:var(--ink2);margin-top:-4px}
+
+/* lecteur */
+.mot{border-radius:4px;cursor:pointer}
+.phrase-on{background:rgba(242,179,61,.3)}
+.mot-on{background:#F2B33D;color:#1E2226;box-shadow:0 0 0 3px #F2B33D}
+.regle{position:absolute;left:0;right:0;pointer-events:none;box-shadow:0 0 0 3000px rgba(30,34,38,.45);border-top:3px solid var(--h);border-bottom:3px solid var(--h);z-index:2}
+
+/* syllabes */
+.syl .s0{color:var(--c0)} .syl .s1{color:var(--c1)}
+.syl.arcs .sy{color:var(--ink);border-bottom:3px solid var(--c0);border-radius:0 0 60% 60%/0 0 12px 12px;padding:0 1px 3px;margin:0 1px}
+.syl.arcs .s1{border-bottom-color:var(--c1)}
+.syl .muet{color:#A59E92!important}
+.syl .son{text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px}
+.syl .w{cursor:pointer;white-space:nowrap;border-radius:4px}
+.syl .w:hover{background:rgba(242,179,61,.25)}
+.palettes{display:flex;gap:8px;flex-wrap:wrap}
+.palette{display:inline-flex;gap:3px;padding:6px;border-radius:8px;border:2px solid #CDC5B6;background:#fff;min-height:44px;align-items:center}
+.palette.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.palette i{width:20px;height:20px;border-radius:4px;display:block}
+
+/* consignes */
+.action{display:grid;grid-template-columns:52px 1fr;gap:14px;background:#fff;border:2px solid var(--line);border-left:8px solid var(--cat);border-radius:8px;padding:16px;margin:12px 0}
+.action .num{width:48px;height:48px;border-radius:50%;background:var(--cat);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:26px}
+.verbe{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:28px;letter-spacing:.05em;text-transform:uppercase;line-height:1.1}
+.cat-tag{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:var(--cat);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.cat-tag .ic{width:16px;height:16px}
+.att{font-size:18px;font-weight:500;margin:6px 0}
+ol.faire{margin:8px 0;padding-left:24px} ol.faire li{margin:4px 0}
+.exemple{background:#F3EEE3;border-radius:6px;padding:10px 12px;font-size:16px;margin-top:8px}
+.piege{font-size:15px;color:#8A3B12;margin-top:8px;font-weight:500}
+mark.v{background:none;border-bottom:4px solid var(--cat);font-weight:700;color:inherit}
+.indices li{margin:6px 0}
+.cat-bloc{margin:8px 0}
+.cat-bloc summary{cursor:pointer;font-weight:600;padding:10px 0;font-size:17px;list-style:none;display:flex;align-items:center;gap:10px}
+.cat-bloc summary::-webkit-details-marker{display:none}
+.cat-bloc summary::before{content:'+';display:inline-flex;width:26px;height:26px;border-radius:5px;border:2px solid var(--cat);color:var(--cat);align-items:center;justify-content:center;font-weight:700}
+.cat-bloc[open] summary::before{content:'–'}
+
+/* étapes */
+.focus{text-align:center;padding:6px 0}
+.compteur{font-family:'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);font-weight:700;font-size:17px}
+.etape-txt{font-size:calc(var(--rs) * 1.3);line-height:1.45;margin:22px auto;max-width:640px;font-weight:600;min-height:3em}
+.crans{display:flex;gap:6px;justify-content:center;margin:14px 0;flex-wrap:wrap}
+.cran{width:30px;height:10px;border-radius:2px;background:#D6CFC2}
+.cran.fait{background:var(--h)} .cran.cur{background:var(--ink)}
+.ligne-etape{display:flex;align-items:center;gap:8px;margin:8px 0}
+.ligne-etape .n{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;width:28px;text-align:center;color:var(--ink2)}
+.ligne-etape input{flex:1}
+
+/* sablier */
+.cadran-w{display:flex;justify-content:center;margin:6px 0}
+svg.cadran{width:min(82vw,360px);height:auto;touch-action:none;cursor:grab;user-select:none}
+.temps{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:46px;text-align:center;letter-spacing:.04em;font-variant-numeric:tabular-nums;line-height:1}
+.phase{text-align:center;font-family:'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;font-weight:700;font-size:18px;margin:4px 0}
+.fini svg.cadran{animation:pulse 1.1s ease-in-out 3}
+@keyframes pulse{50%{transform:scale(1.04)}}
+
+/* opérations */
+.grille-w{overflow-x:auto;padding:4px 0}
+.grille{display:inline-grid;gap:4px;padding:14px;background:#fff;border:2px solid var(--line);border-radius:8px}
+.gc{width:52px;height:58px;display:flex;align-items:center;justify-content:center;font-size:30px;font-family:'Lexend',sans-serif;border-radius:4px}
+input.gc{border:2px solid #9AA1A8;text-align:center;padding:0;font-size:30px;width:52px;-moz-appearance:textfield}
+.gret{height:40px!important;font-size:18px!important;color:var(--h)}
+input.gret{border-style:dashed}
+.glab{height:24px!important;font-size:13px!important;color:var(--ink2);font-weight:600}
+.gsigne{font-weight:700;color:var(--ink)}
+.gtrait{grid-column:1/-1;height:3px;background:var(--ink);margin:2px 0}
+.ok{background:#DDF0DB!important;border-color:#3E8E41!important}
+.ko{background:#FBE1CF!important;border-color:#D9641E!important}
+.symboles{display:flex;gap:8px}
+
+/* aides */
+.pyth-w{overflow-x:auto}
+table.pyth{border-collapse:collapse;margin:8px 0;font-variant-numeric:tabular-nums}
+.pyth th,.pyth td{width:44px;height:44px;text-align:center;border:1px solid #D2CABB;font-size:18px;padding:0}
+.pyth th{background:#ECE5D7;font-weight:700}
+.pyth td{background:#fff;cursor:pointer}
+.pyth .hl{background:#F7E7C2}
+.pyth .sel{background:var(--h);color:var(--h-txt);font-weight:700}
+.resultat-pyth{font-size:calc(var(--rs) * 1.6);font-weight:700;min-height:1.5em;font-variant-numeric:tabular-nums}
+.fiches{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.fiche{background:#fff;border:2px solid var(--line);border-top:8px solid var(--fc);border-radius:8px;padding:14px;text-align:left;min-height:110px;font-family:var(--rf)}
+.fiche b{display:block;font-size:18px;margin-bottom:6px}
+.fiche span{font-size:14px;color:var(--ink2);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.fiche-vue{white-space:pre-wrap}
+
+/* pause */
+.souffle{display:flex;flex-direction:column;align-items:center;gap:16px;padding:14px 0}
+.bulle{width:230px;height:230px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#E9DFC9);border:5px solid var(--h);display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;letter-spacing:.08em;text-transform:uppercase;transform:scale(.62);transition-property:transform;transition-timing-function:ease-in-out}
+.barre-prog{width:100%;max-width:420px;height:12px;border-radius:6px;background:#DDD5C7;overflow:hidden}
+.barre-prog i{display:block;height:100%;background:var(--h);width:0;transition:width .3s linear}
+.mouvement{font-size:calc(var(--rs) * 1.25);font-weight:600;text-align:center;max-width:560px;min-height:3em}
+
+/* météo */
+.meteos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.meteo-btn{background:#fff;border:2px solid var(--line);border-radius:10px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:600;font-size:16px;min-height:150px;text-align:center;font-family:var(--rf)}
+.meteo-btn.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.meteo-btn svg{width:72px;height:72px}
+.releves{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.releves svg{width:34px;height:34px}
+.releve{display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--ink2);width:46px}
+
+/* carte de besoins (plein écran) */
+.plein{position:fixed;inset:0;z-index:50;background:rgba(20,24,28,.8);overflow:auto;padding:18px}
+.carte-id{max-width:740px;margin:16px auto;background:#FBF8F1;border-radius:14px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.5);font-family:var(--rf)}
+.carte-id .bandeau{background:var(--h);color:var(--h-txt);padding:18px 24px}
+.carte-id .bandeau b{font-family:'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;font-size:15px;opacity:.85;display:block}
+.carte-id h2{margin:4px 0 0;font-size:32px;line-height:1.15}
+.carte-id .corps{padding:18px 26px 26px;font-size:20px;line-height:1.55}
+.carte-id h4{font-family:'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2);margin:18px 0 6px;font-size:16px}
+.carte-id ul{margin:0;padding-left:26px}
+.plein .rang{max-width:740px;margin:0 auto}
+
+/* popover Aa */
+#pop{position:fixed;top:74px;right:12px;z-index:40;width:min(390px,calc(100vw - 24px));background:var(--paper);border-radius:10px;box-shadow:0 14px 40px rgba(0,0,0,.45);padding:18px;max-height:calc(100vh - 92px);overflow:auto;border-top:6px solid var(--h);font-size:16px}
+.polices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.polices button{min-height:48px;border:2px solid #CDC5B6;border-radius:6px;background:#fff;font-size:17px}
+.polices button.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.fonds{display:flex;gap:8px;flex-wrap:wrap}
+.fond{width:44px;height:44px;border-radius:8px;border:2px solid #BDB5A6}
+.fond.on{border:3px solid var(--ink);box-shadow:0 0 0 2px #fff inset}
+.apercu{padding:12px;border-radius:6px;border:2px solid var(--line);margin-top:12px;background:var(--rbg)}
+
+/* atelier */
+.ligne-lame{display:flex;align-items:center;gap:12px;padding:10px 12px;background:#fff;border:2px solid var(--line);border-radius:8px;margin:8px 0}
+.ligne-lame>.ic{width:28px;height:28px;color:#4A5157}
+.ligne-lame .grow{flex:1;min-width:0}
+.ligne-lame .grow b{display:block}
+.ligne-lame .grow small{color:var(--ink2);font-size:14px}
+.ligne-lame.off{opacity:.62}
+.manches{display:flex;gap:10px;flex-wrap:wrap}
+.manche-c{width:52px;height:52px;border-radius:26px;border:3px solid transparent;box-shadow:inset 0 0 0 2px rgba(0,0,0,.2),inset 6px 0 8px rgba(255,255,255,.25)}
+.manche-c.on{border-color:var(--ink);box-shadow:0 0 0 3px #fff inset}
+
+/* montage (accueil) */
+.montage{max-width:780px;margin:0 auto;color:#F3EFE6}
+.montage h1{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:46px;letter-spacing:.06em;text-transform:uppercase;margin:6px 0 4px;line-height:1}
+.montage p{color:rgba(243,239,230,.82);font-size:17px}
+.montage .lab{color:#F3EFE6}
+.packs{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:12px;margin-top:8px}
+.pack{text-align:left;background:var(--paper);color:var(--ink);border:3px solid transparent;border-radius:10px;padding:16px 50px 16px 16px;min-height:128px;position:relative;font-family:'Lexend',sans-serif}
+.pack.on{border-color:#F2B33D}
+.pack .t{font-weight:700;font-size:18px;display:block}
+.pack .d{font-size:14px;color:var(--ink2);margin-top:6px;display:block}
+.pack .lst{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.07em;font-size:14px;margin-top:10px;color:var(--h);font-weight:700;display:block}
+.pack .case{position:absolute;top:14px;right:14px}
+.pack.on .case{background:var(--h);border-color:var(--h-dark);color:#fff}
+
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,140px);background:var(--ink);color:#fff;padding:13px 20px;border-radius:8px;transition:transform .3s,visibility .3s;visibility:hidden;z-index:60;font-size:16px;max-width:90vw;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+#toast.on{transform:translate(-50%,0);visibility:visible}
+
+@media (max-width:600px){
+  .manche{flex-basis:54px;border-radius:27px}
+  .lames{margin-left:-26px}
+  .lame{padding:10px 46px 10px 38px;min-height:64px;gap:10px}
+  .lame .nom{font-size:20px}
+  .lame .sous{font-size:13px}
+  .lame .ic{width:26px;height:26px}
+  .sheet{padding:22px 14px 26px}
+  .gc,input.gc{width:40px;height:48px;font-size:24px}
+  .icobtn .lbl{display:none}
+  .marque small{display:none}
+  .grille2{grid-template-columns:1fr}
+  .montage h1{font-size:36px}
+  .pyth th,.pyth td{width:32px;height:36px;font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+@media print{
+  body{background:#fff}
+  #bar,#view,#toast,#pop,.no-print{display:none!important}
+  .plein{position:static;background:none;padding:0}
+  .carte-id{box-shadow:none;border:2px solid #000}
+}
+</style>
+</head>
+<body>
+<header id="bar"></header>
+<main id="view" tabindex="-1"></main>
+<div id="pop" hidden role="dialog" aria-label="Confort de lecture"></div>
+<div id="plein" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+'use strict';
+
+var CLE = 'brot2you-multitool-v1';
+
+/* =========================================================
+   Utilitaires
+   ========================================================= */
+function $(s) { return document.querySelector(s); }
+function h(tag, props) {
+  var e = document.createElement(tag), k, v, i;
+  if (props) {
+    for (k in props) {
+      if (!props.hasOwnProperty(k)) continue;
+      v = props[k];
+      if (v === undefined || v === null || v === false) continue;
+      if (k === 'class') e.className = v;
+      else if (k === 'text') e.textContent = v;
+      else if (k === 'html') e.innerHTML = v;
+      else if (k === 'style') e.style.cssText = v;
+      else if (k === 'value') e.value = v;
+      else if (k === 'checked') e.checked = !!v;
+      else if (k.indexOf('on') === 0 && typeof v === 'function') e.addEventListener(k.slice(2), v);
+      else e.setAttribute(k, v === true ? '' : v);
+    }
+  }
+  for (i = 2; i < arguments.length; i++) ajoute(e, arguments[i]);
+  return e;
+}
+function ajoute(e, c) {
+  var i;
+  if (c === null || c === undefined || c === false) return;
+  if (Object.prototype.toString.call(c) === '[object Array]') { for (i = 0; i < c.length; i++) ajoute(e, c[i]); }
+  else if (typeof c === 'string' || typeof c === 'number') e.appendChild(document.createTextNode(String(c)));
+  else e.appendChild(c);
+}
+function vider(e) { while (e.firstChild) e.removeChild(e.firstChild); }
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+function isoJour(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function depuisIso(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function plusJours(d, n) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; }
+function aujourdhui() { var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function estObjet(o) { return o !== null && typeof o === 'object' && Object.prototype.toString.call(o) !== '[object Array]'; }
+function remplir(def, obj) {
+  var k;
+  if (obj === undefined || obj === null) return clone(def);
+  if (estObjet(def) && estObjet(obj)) {
+    for (k in def) { if (def.hasOwnProperty(k)) obj[k] = remplir(def[k], obj[k]); }
+    return obj;
+  }
+  if (Object.prototype.toString.call(def) === '[object Array]' && Object.prototype.toString.call(obj) !== '[object Array]') return clone(def);
+  return obj;
+}
+function sansAccent(s) {
+  return s.toLowerCase()
+    .replace(/[àâä]/g, 'a').replace(/[éèêë]/g, 'e').replace(/[îï]/g, 'i')
+    .replace(/[ôö]/g, 'o').replace(/[ùûü]/g, 'u').replace(/ç/g, 'c')
+    .replace(/œ/g, 'oe').replace(/æ/g, 'ae').replace(/ÿ/g, 'y').replace(/’/g, "'");
+}
+function trouve(arr, fn) { for (var i = 0; i < arr.length; i++) if (fn(arr[i], i)) return arr[i]; return null; }
+function indexDe(arr, fn) { for (var i = 0; i < arr.length; i++) if (fn(arr[i], i)) return i; return -1; }
+var JOURS = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+var MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+function libDate(d) { return JOURS[d.getDay()] + ' ' + d.getDate() + ' ' + MOIS[d.getMonth()]; }
+
+/* ---------- icônes (tracées à la main, trait 2px) */
+var ICONES = {
+  lecteur: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 9a4 4 0 0 1 0 6"/><path d="M19 6.5a8 8 0 0 1 0 11"/>',
+  syllabes: '<path d="M3 15c1.6 3.4 6.4 3.4 8 0"/><path d="M13 15c1.6 3.4 6.4 3.4 8 0"/><path d="M5 11h4M15 11h4"/><path d="M5 7h4M15 7h4"/>',
+  consignes: '<circle cx="10" cy="10" r="6.5"/><path d="M15 15l5.5 5.5"/><path d="M7.5 9h5M7.5 11.8h3"/>',
+  etapes: '<path d="M3 20h5v-5h5v-5h5V5h3"/>',
+  sablier: '<circle cx="12" cy="13" r="8"/><path d="M12 13V8.5"/><path d="M12 13l3.2 3"/><path d="M9.5 2.5h5"/>',
+  sac: '<path d="M6 10a6 6 0 0 1 12 0v10.5H6z"/><path d="M9.5 4.5V3h5v1.5"/><path d="M9 14h6v3H9z"/>',
+  devoirs: '<rect x="4" y="5" width="16" height="15.5" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/><path d="M8 14h3M8 17h6"/>',
+  mots: '<path d="M3.5 19 8.5 5l5 14"/><path d="M5.5 14h6"/><path d="M15 12l2.5 2.5L22 9"/>',
+  operations: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
+  aides: '<rect x="7" y="3" width="13" height="15" rx="2"/><path d="M4 7v12a2 2 0 0 0 2 2h10"/><path d="M10.5 8h6M10.5 12h6"/>',
+  pause: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/>',
+  meteo: '<path d="M7 19h10a4 4 0 0 0 .4-8A6 6 0 0 0 6 12a3.5 3.5 0 0 0 1 7z"/><path d="M15 3v1.5M20.5 6.5 19.4 7.6"/>',
+  carte: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 16.5c.8-1.6 2-2.3 3.5-2.3s2.7.7 3.5 2.3"/><path d="M15 10h3.5M15 13.5h3.5"/>',
+  reglages: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
+  retour: '<path d="M15 5l-7 7 7 7"/>',
+  lire: '<path d="M7 4.5l12 7.5-12 7.5z"/>',
+  pausebtn: '<path d="M7.5 5h3v14h-3zM13.5 5h3v14h-3z"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="1"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  poubelle: '<path d="M4 7h16M9.5 7V4h5v3M6 7l1 13h10l1-13"/>',
+  coche: '<path d="M4.5 12.5l5 5L20 7"/>',
+  haut: '<path d="M6 15l6-6 6 6"/>',
+  bas: '<path d="M6 9l6 6 6-6"/>',
+  croix: '<path d="M6 6l12 12M18 6 6 18"/>',
+  crayon: '<path d="M4 20l4-1L19 8l-3-3L5 16z"/><path d="M14 7l3 3"/>',
+  bulle: '<path d="M4 5h16v11H10l-5 4v-4H4z"/>',
+  marque: '<path d="M4 20h16"/><path d="M7 16l4-11 4 11M8.5 12h5"/>',
+  calc: '<path d="M4 7h6M7 4v6M14 7h6M4 17h6M14 15l5 4M19 15l-5 4"/>',
+  blocs: '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/>',
+  imprimer: '<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="1.5"/><path d="M7 14h10v7H7z"/>',
+  oeil: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  telecharger: '<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 20h16"/>',
+  ouvrir: '<path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 20h16"/>',
+  reprendre: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/>'
+};
+function ico(n) {
+  return h('span', { 'class': 'ic', 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICONES[n] || '') + '</svg>' });
+}
+function btn(txt, icone, fn, cls, extra) {
+  var p = { 'class': 'btn' + (cls ? ' ' + cls : ''), type: 'button', onclick: fn };
+  if (extra) { for (var k in extra) if (extra.hasOwnProperty(k)) p[k] = extra[k]; }
+  return h('button', p, icone ? ico(icone) : null, txt);
+}
+function bascule(label, valeur, fn) {
+  var cb = h('input', { type: 'checkbox', 'class': 'sw', checked: valeur, onchange: function () { fn(cb.checked); } });
+  return h('label', { 'class': 'bascule' }, cb, h('span', null, label));
+}
+function choix(options, valeur, fn) {
+  var c = h('div', { 'class': 'choix', role: 'group' });
+  options.forEach(function (o) {
+    var b = h('button', { type: 'button', 'class': o[0] === valeur ? 'on' : '', 'aria-pressed': o[0] === valeur ? 'true' : 'false', onclick: function () {
+      var bs = c.querySelectorAll('button'); for (var i = 0; i < bs.length; i++) { bs[i].className = ''; bs[i].setAttribute('aria-pressed', 'false'); }
+      b.className = 'on'; b.setAttribute('aria-pressed', 'true'); fn(o[0]);
+    } }, o[1]);
+    c.appendChild(b);
+  });
+  return c;
+}
+function onglets(liste, actif, fn) {
+  var c = h('div', { 'class': 'onglets', role: 'tablist' });
+  liste.forEach(function (o) {
+    c.appendChild(h('button', { type: 'button', role: 'tab', 'class': 'onglet' + (o[0] === actif ? ' on' : ''), 'aria-selected': o[0] === actif ? 'true' : 'false', onclick: function () { fn(o[0]); } }, o[1]));
+  });
+  return c;
+}
+var toastT = null;
+function toast(msg) {
+  var t = $('#toast'); t.textContent = msg; t.className = 'on';
+  clearTimeout(toastT); toastT = setTimeout(function () { t.className = ''; }, 2600);
+}
+
+/* =========================================================
+   État et sauvegarde
+   ========================================================= */
+var MATIERES_DEF = [
+  { id: 'fr', nom: 'Français', c: '#C0392B', items: ['Cahier de français', 'Livre de lecture'] },
+  { id: 'ma', nom: 'Maths', c: '#2E6DB4', items: ['Cahier de maths', 'Règle, équerre, compas', 'Calculatrice'] },
+  { id: 'an', nom: 'Anglais', c: '#B7791F', items: ["Cahier d'anglais", 'Manuel d’anglais'] },
+  { id: 'hg', nom: 'Histoire-Géo', c: '#7B4F2C', items: ["Cahier d'histoire-géo"] },
+  { id: 'svt', nom: 'SVT', c: '#2F855A', items: ['Classeur de SVT'] },
+  { id: 'pc', nom: 'Physique-Chimie', c: '#2C7A7B', items: ['Cahier de physique-chimie', 'Calculatrice'] },
+  { id: 'te', nom: 'Technologie', c: '#4A5568', items: ['Classeur de techno'] },
+  { id: 'ap', nom: 'Arts plastiques', c: '#B83280', items: ['Pochette de dessin', 'Crayons de couleur'] },
+  { id: 'mu', nom: 'Musique', c: '#6B46C1', items: ['Cahier de musique'] },
+  { id: 'eps', nom: 'EPS', c: '#D9641E', items: ['Tenue de sport', 'Baskets', 'Gourde'] },
+  { id: 'lv2', nom: 'LV2', c: '#8C6D1F', items: ['Cahier de LV2'] }
+];
+var FICHES_DEF = [
+  { id: 'f1', titre: 'a ou à ?', c: '#2E6DB4', txt: "« a » est le verbe avoir.\nAstuce : si je peux dire « avait », j'écris « a ».\nIl a un chat → il avait un chat ✔\n\n« à » est une petite préposition.\nJe vais à Paris → je vais avait Paris ✘ donc « à »." },
+  { id: 'f2', titre: 'Present simple (anglais)', c: '#B7791F', txt: "Pour les habitudes et les vérités générales.\n\nI play / you play / we play / they play\nHe plays / she plays / it plays → avec he, she, it : on ajoute -s !\n\nNégation : I don't play / He doesn't play\nQuestion : Do you play? / Does he play?" },
+  { id: 'f3', titre: 'Accorder un adjectif', c: '#2F855A', txt: "L'adjectif s'accorde avec le nom qu'il décrit.\n\nFéminin : souvent + e → petit / petite\nPluriel : souvent + s → petit / petits\n\nAstuce : je cherche le nom.\n« Les fleurs sont belles. » → fleurs = féminin pluriel → belles" }
+];
+var DEFAUT = {
+  v: 1, monte: false, prenom: '', couleur: 'rouge', sons: true,
+  lames: ['lecteur', 'consignes', 'etapes', 'sablier', 'sac', 'pause'],
+  lecture: { police: 'Lexend', taille: 20, interligne: 1.7, lettres: 0.02, mots: 0.12, fond: 'creme' },
+  lecteur: { texte: '', lang: 'fr', vitesse: 0.9, voix: { fr: '', en: '' }, suivre: true },
+  syl: { texte: '', mode: 'couleurs', palette: 0, muettes: true, sons: false },
+  consigne: '',
+  etapes: { list: [], active: '' },
+  sablier: { min: 10, chiffres: true, cycle: false, travail: 15, repos: 5 },
+  sac: { matieres: MATIERES_DEF, edt: { '1': [], '2': [], '3': [], '4': [], '5': [] }, toujours: ['Trousse', 'Agenda', 'Carnet de liaison'], coches: {} },
+  devoirs: [],
+  mots: [],
+  op: '',
+  fiches: FICHES_DEF,
+  meteo: [],
+  carte: { prenom: '', classe: '', jai: '', aides: [], perso: [], difficile: '', decroche: '' }
+};
+var S;
+(function charger() {
+  var brut = null;
+  try { brut = JSON.parse(localStorage.getItem(CLE) || 'null'); } catch (e) { brut = null; }
+  S = remplir(DEFAUT, brut && typeof brut === 'object' ? brut : undefined);
+})();
+function sauver() { try { localStorage.setItem(CLE, JSON.stringify(S)); } catch (e) { } }
+
+var COULEURS = {
+  rouge: { c: '#B5212B', d: '#7E141C', t: '#FFFFFF', nom: 'Rouge' },
+  marine: { c: '#1F3A5F', d: '#11223A', t: '#FFFFFF', nom: 'Bleu marine' },
+  olive: { c: '#5B6B2E', d: '#3B4719', t: '#FFFFFF', nom: 'Olive' },
+  noir: { c: '#2A2D31', d: '#111315', t: '#FFFFFF', nom: 'Noir' },
+  orange: { c: '#D2601A', d: '#93410E', t: '#FFFFFF', nom: 'Orange' },
+  bordeaux: { c: '#6E1F2E', d: '#451019', t: '#FFFFFF', nom: 'Bordeaux' },
+  jaune: { c: '#E2B227', d: '#9A7712', t: '#1E2226', nom: 'Jaune' },
+  turquoise: { c: '#17807A', d: '#0D524E', t: '#FFFFFF', nom: 'Turquoise' }
+};
+var POLICES = {
+  Lexend: "'Lexend',sans-serif",
+  Atkinson: "'Atkinson Hyperlegible',sans-serif",
+  Andika: "'Andika',sans-serif",
+  Verdana: 'Verdana,Geneva,sans-serif'
+};
+var FONDS = { creme: '#F6F1E7', blanc: '#FFFFFF', jaune: '#FBF3C8', bleu: '#E3EDF8', vert: '#E4F0E1', rose: '#F7E5E2', gris: '#E8E8E4' };
+var PALETTES = [['#1F5FAD', '#C62828'], ['#1F5FAD', '#2E7D32'], ['#7A3E9D', '#D2601A'], ['#1E2226', '#8A8F96']];
+
+function appliquerTheme() {
+  var r = document.documentElement.style, c = COULEURS[S.couleur] || COULEURS.rouge, L = S.lecture;
+  r.setProperty('--h', c.c); r.setProperty('--h-dark', c.d); r.setProperty('--h-txt', c.t);
+  r.setProperty('--rf', POLICES[L.police] || POLICES.Lexend);
+  r.setProperty('--rs', L.taille + 'px'); r.setProperty('--rlh', String(L.interligne));
+  r.setProperty('--rls', L.lettres + 'em'); r.setProperty('--rws', L.mots + 'em');
+  r.setProperty('--rbg', FONDS[L.fond] || FONDS.creme);
+  var p = PALETTES[S.syl.palette] || PALETTES[0];
+  r.setProperty('--c0', p[0]); r.setProperty('--c1', p[1]);
+}
+
+/* =========================================================
+   Sons (doux, désactivables)
+   ========================================================= */
+var actx = null;
+function audioPret() {
+  try {
+    if (!actx) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; actx = new AC(); }
+    if (actx.state === 'suspended') actx.resume();
+  } catch (e) { return null; }
+  return actx;
+}
+function sonner(type) {
+  if (!S.sons) return;
+  var a = audioPret(); if (!a) return;
+  var notes = type === 'fin' ? [523.25, 659.25, 783.99, 1046.5] : (type === 'juste' ? [659.25, 987.77] : [587.33, 880]);
+  var t0 = a.currentTime + 0.02;
+  notes.forEach(function (f, i) {
+    var o = a.createOscillator(), g = a.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t0 + i * 0.16);
+    g.gain.exponentialRampToValueAtTime(0.16, t0 + i * 0.16 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.16 + 0.9);
+    o.connect(g); g.connect(a.destination);
+    o.start(t0 + i * 0.16); o.stop(t0 + i * 0.16 + 1);
+  });
+}
+
+/* =========================================================
+   Synthèse vocale
+   ========================================================= */
+var TTS = {
+  ok: typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined',
+  voix: [], jeton: 0, surChange: null,
+  charger: function () { if (TTS.ok) TTS.voix = window.speechSynthesis.getVoices() || []; },
+  pour: function (lang) {
+    var out = [], i;
+    for (i = 0; i < TTS.voix.length; i++) { if ((TTS.voix[i].lang || '').toLowerCase().replace('_', '-').indexOf(lang) === 0) out.push(TTS.voix[i]); }
+    return out;
+  },
+  choisir: function (lang) {
+    var l = TTS.pour(lang), nom = S.lecteur.voix[lang], i;
+    for (i = 0; i < l.length; i++) if (l[i].name === nom) return l[i];
+    if (lang === 'en') { for (i = 0; i < l.length; i++) if (/en-gb/i.test(l[i].lang.replace('_', '-'))) return l[i]; }
+    for (i = 0; i < l.length; i++) if (l[i].localService) return l[i];
+    return l[0] || null;
+  },
+  enonce: function (texte, lang, vitesse) {
+    var u = new window.SpeechSynthesisUtterance(texte);
+    u.lang = lang === 'en' ? 'en-GB' : 'fr-FR';
+    var v = TTS.choisir(lang); if (v) u.voice = v;
+    u.rate = vitesse || S.lecteur.vitesse;
+    return u;
+  },
+  stop: function () { TTS.jeton++; if (TTS.ok) { try { window.speechSynthesis.cancel(); } catch (e) { } } },
+  dire: function (texte, lang, fin) {
+    if (!TTS.ok) { toast('Ce navigateur ne sait pas lire à voix haute.'); return; }
+    TTS.stop();
+    var u = TTS.enonce(texte, lang || 'fr');
+    if (fin) u.onend = fin;
+    setTimeout(function () { window.speechSynthesis.speak(u); }, 60);
+  }
+};
+if (TTS.ok) {
+  TTS.charger();
+  window.speechSynthesis.onvoiceschanged = function () { TTS.charger(); if (TTS.surChange) TTS.surChange(); };
+}
+
+/* =========================================================
+   Règle de lecture (bande qui suit le doigt / la souris)
+   ========================================================= */
+function regle(zone) {
+  var bande = null, y = 0;
+  function hauteur() {
+    var cs = window.getComputedStyle(zone), lh = parseFloat(cs.lineHeight);
+    if (isNaN(lh)) lh = parseFloat(cs.fontSize) * 1.6;
+    return Math.round(lh * 1.15);
+  }
+  function placer(py) {
+    if (!bande) return;
+    var hh = hauteur(); bande.style.height = hh + 'px'; y = Math.max(hh / 2, py);
+    bande.style.top = (y - hh / 2) + 'px';
+  }
+  function pos(ev) {
+    var r = zone.getBoundingClientRect(), cy = ev.touches ? ev.touches[0].clientY : ev.clientY;
+    placer(cy - r.top + zone.scrollTop);
+  }
+  zone.addEventListener('mousemove', function (e) { if (bande) pos(e); });
+  zone.addEventListener('touchstart', function (e) { if (bande) pos(e); }, { passive: true });
+  zone.addEventListener('touchmove', function (e) { if (bande) pos(e); }, { passive: true });
+  zone.addEventListener('keydown', function (e) {
+    if (!bande) return;
+    if (e.keyCode === 40) { placer(y + hauteur() / 1.15); e.preventDefault(); }
+    if (e.keyCode === 38) { placer(y - hauteur() / 1.15); e.preventDefault(); }
+  });
+  return {
+    basculer: function (on) {
+      if (on && !bande) { bande = h('div', { 'class': 'regle' }); zone.appendChild(bande); zone.setAttribute('tabindex', '0'); placer(hauteur() / 2 + 16); }
+      else if (!on && bande) { if (bande.parentNode) bande.parentNode.removeChild(bande); bande = null; }
+    },
+    rafraichir: function () { if (bande && bande.parentNode !== zone) { zone.appendChild(bande); placer(y); } }
+  };
+}
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+var OUTILS = [
+  { id: 'lecteur', nom: 'Lecteur', sous: 'Écouter un texte', ic: 'lecteur', rendu: rLecteur },
+  { id: 'syllabes', nom: 'Syllabes', sous: 'Colorer les syllabes', ic: 'syllabes', rendu: rSyllabes },
+  { id: 'consignes', nom: 'Décodeur', sous: 'Comprendre une consigne', ic: 'consignes', rendu: rConsignes },
+  { id: 'etapes', nom: 'Étapes', sous: 'Découper une tâche', ic: 'etapes', rendu: rEtapes },
+  { id: 'sablier', nom: 'Sablier', sous: 'Voir le temps qui reste', ic: 'sablier', rendu: rSablier },
+  { id: 'sac', nom: 'Mon sac', sous: 'Préparer le cartable', ic: 'sac', rendu: rSac },
+  { id: 'devoirs', nom: 'Devoirs', sous: 'Ce soir, cette semaine', ic: 'devoirs', rendu: rDevoirs },
+  { id: 'mots', nom: 'Mots pièges', sous: 'Mon dictionnaire perso', ic: 'mots', rendu: rMots },
+  { id: 'operations', nom: 'Opérations', sous: 'Poser un calcul', ic: 'operations', rendu: rOperations },
+  { id: 'aides', nom: 'Aides', sous: 'Tables et fiches outils', ic: 'aides', rendu: rAides },
+  { id: 'pause', nom: 'Pause', sous: 'Respirer, bouger', ic: 'pause', rendu: rPause },
+  { id: 'meteo', nom: 'Météo', sous: 'Comment je me sens', ic: 'meteo', rendu: rMeteo },
+  { id: 'carte', nom: 'Ma carte', sous: 'Expliquer mes besoins', ic: 'carte', rendu: rCarte }
+];
+function outil(id) { return trouve(OUTILS, function (o) { return o.id === id; }); }
+var outilCourant = null, outilPrecedent = null, nettoyages = [];
+function quitter() { TTS.stop(); TTS.surChange = null; Chrono.vue = null; for (var i = 0; i < nettoyages.length; i++) { try { nettoyages[i](); } catch (e) { } } nettoyages = []; fermerAa(); }
+function aller(id) { if (location.hash.replace('#', '') === id) route(); else location.hash = id; }
+function route() {
+  var id = location.hash.replace('#', '');
+  if (id === 'atelier') rAtelier();
+  else if (outil(id) && S.monte) ouvrir(id);
+  else accueil();
+}
+window.addEventListener('hashchange', route);
+
+var puceChrono = null;
+function barre(mode, titre) {
+  var b = $('#bar'); vider(b);
+  if (mode === 'accueil') b.appendChild(h('div', { 'class': 'marque' }, 'MULTITOOL', h('small', null, 'by BROT2YOU')));
+  else {
+    b.appendChild(h('button', { 'class': 'icobtn', type: 'button', 'aria-label': 'Refermer la lame', onclick: function () { aller(''); } }, ico('retour'), h('span', { 'class': 'lbl' }, 'Refermer')));
+    b.appendChild(h('div', { 'class': 'bar-titre' }, titre));
+  }
+  b.appendChild(h('div', { 'class': 'spacer' }));
+  puceChrono = h('button', { 'class': 'icobtn chrono', type: 'button', 'aria-label': 'Voir le sablier', onclick: function () { aller('sablier'); } });
+  b.appendChild(puceChrono); majPuceChrono();
+  b.appendChild(h('button', { 'class': 'icobtn', type: 'button', id: 'btnAa', style: 'text-transform:none', 'aria-label': 'Confort de lecture', onclick: basculerAa }, 'Aa'));
+  if (mode === 'accueil') b.appendChild(h('button', { 'class': 'icobtn', type: 'button', 'aria-label': 'Atelier', onclick: function () { aller('atelier'); } }, ico('reglages'), h('span', { 'class': 'lbl' }, 'Atelier')));
+}
+function feuille() { var v = $('#view'); vider(v); var sh = h('div', { 'class': 'sheet' }); v.appendChild(sh); window.scrollTo(0, 0); return sh; }
+
+function ouvrir(id) {
+  quitter();
+  if (outilCourant && outilCourant !== id) outilPrecedent = outilCourant;
+  outilCourant = id;
+  var o = outil(id);
+  barre('outil', o.nom);
+  o.rendu(feuille());
+}
+
+/* ---------- accueil : le couteau */
+function accueil() {
+  quitter();
+  if (!S.monte) { montage(); return; }
+  if (outilCourant) outilPrecedent = outilCourant;
+  outilCourant = null;
+  barre('accueil');
+  var v = $('#view'); vider(v);
+  var lames = S.lames.filter(function (id) { return !!outil(id); });
+  var manche = h('div', { 'class': 'manche', 'aria-hidden': 'true' },
+    h('span', { 'class': 'rivet' }),
+    h('span', { 'class': 'gravure' }, S.prenom ? S.prenom : 'Multitool'),
+    h('span', { 'class': 'plaque' }, 'B2Y'),
+    h('span', { 'class': 'rivet' }));
+  var zl = h('div', { 'class': 'lames', role: 'list' });
+  if (!lames.length) {
+    zl.appendChild(h('div', { 'class': 'lame-w' }, h('button', { 'class': 'lame t1', type: 'button', onclick: function () { aller('atelier'); } },
+      ico('reglages'), h('span', null, h('span', { 'class': 'nom' }, 'Aucune lame'), h('span', { 'class': 'sous' }, 'Ouvre l’atelier pour en monter')))));
+  }
+  lames.forEach(function (id, i) {
+    var o = outil(id);
+    zl.appendChild(h('div', { 'class': 'lame-w', role: 'listitem', style: 'animation-delay:' + (i * 70) + 'ms' },
+      h('button', { 'class': 'lame t' + (i % 4), type: 'button', onclick: function () { aller(id); } },
+        ico(o.ic), h('span', null, h('span', { 'class': 'nom' }, o.nom), h('span', { 'class': 'sous' }, o.sous)))));
+  });
+  v.appendChild(h('div', { 'class': 'couteau' }, manche, zl));
+  v.appendChild(h('p', { 'class': 'consigne-mat' }, 'Touche une lame pour l’ouvrir.'));
+  var reste = OUTILS.filter(function (o) { return lames.indexOf(o.id) < 0; });
+  if (reste.length) {
+    var p = h('div', { 'class': 'puces' });
+    reste.forEach(function (o) { p.appendChild(h('button', { 'class': 'puce-lame', type: 'button', onclick: function () { aller(o.id); } }, ico(o.ic), o.nom)); });
+    v.appendChild(h('div', { 'class': 'boite' }, h('h2', null, 'Dans la boîte à outils'), p));
+  }
+}
+
+/* ---------- montage (premier lancement) */
+var PACKS = [
+  { t: 'Lire plus facilement', d: 'Quand lire est long, fatigant, ou que les lettres se mélangent.', l: ['lecteur', 'syllabes', 'mots'] },
+  { t: 'Comprendre ce qu’on me demande', d: 'Quand je ne sais pas par où commencer un exercice.', l: ['consignes', 'etapes'] },
+  { t: 'M’organiser', d: 'Quand j’oublie mes affaires ou mes devoirs.', l: ['sac', 'devoirs'] },
+  { t: 'Rester concentré·e', d: 'Quand je décroche ou que le temps file sans que je le voie.', l: ['sablier', 'etapes', 'pause'] },
+  { t: 'Me calmer, souffler', d: 'Quand je suis agité·e, énervé·e ou fatigué·e.', l: ['pause', 'meteo'] },
+  { t: 'Écrire et calculer', d: 'Quand aligner, poser un calcul ou retenir l’orthographe est dur.', l: ['operations', 'aides', 'mots'] },
+  { t: 'Expliquer mes besoins', d: 'Pour montrer aux profs ce qui m’aide vraiment.', l: ['carte'] }
+];
+function montage() {
+  barre('accueil');
+  var v = $('#view'); vider(v);
+  var choisis = [];
+  var nom = h('input', { type: 'text', maxlength: '18', placeholder: 'Ton prénom (facultatif)', value: S.prenom, autocomplete: 'off' });
+  var bMonter = btn('Monter mes lames', 'coche', function () {
+    var ids = [];
+    choisis.forEach(function (i) { PACKS[i].l.forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); }); });
+    S.lames = OUTILS.map(function (o) { return o.id; }).filter(function (id) { return ids.indexOf(id) >= 0; });
+    S.prenom = nom.value.trim(); S.carte.prenom = S.carte.prenom || S.prenom;
+    S.monte = true; sauver(); aller('');
+  }, 'prim gros', { disabled: true });
+  var grille = h('div', { 'class': 'packs' });
+  PACKS.forEach(function (p, i) {
+    var b = h('button', { 'class': 'pack', type: 'button', 'aria-pressed': 'false', onclick: function () {
+      var k = choisis.indexOf(i);
+      if (k < 0) choisis.push(i); else choisis.splice(k, 1);
+      b.className = 'pack' + (k < 0 ? ' on' : ''); b.setAttribute('aria-pressed', k < 0 ? 'true' : 'false');
+      bMonter.disabled = !choisis.length;
+    } },
+      h('span', { 'class': 't' }, p.t), h('span', { 'class': 'd' }, p.d),
+      h('span', { 'class': 'lst' }, p.l.map(function (id) { return outil(id).nom; }).join(' · ')),
+      h('span', { 'class': 'case' }, ico('coche')));
+    grille.appendChild(b);
+  });
+  v.appendChild(h('div', { 'class': 'montage' },
+    h('h1', null, 'Monte ton multitool'),
+    h('p', null, 'Choisis ce qui pourrait t’aider. Chaque choix ajoute des lames à ton couteau. Tu pourras tout changer plus tard dans l’atelier.'),
+    h('label', { 'class': 'lab', 'for': 'nomG' }, 'Gravure sur le manche'),
+    (function () { nom.id = 'nomG'; return nom; })(),
+    h('label', { 'class': 'lab' }, 'Ce qui m’aiderait'),
+    grille,
+    h('div', { 'class': 'rang', style: 'margin-top:22px' }, bMonter,
+      h('button', { 'class': 'btn', type: 'button', onclick: function () { S.prenom = nom.value.trim(); S.lames = []; S.monte = true; sauver(); aller('atelier'); } }, 'Choisir lame par lame'))));
+}
+
+/* ---------- confort de lecture (Aa) */
+function controlesLecture(c, apres) {
+  var L = S.lecture;
+  function maj() { appliquerTheme(); sauver(); if (apres) apres(); }
+  function curseur(label, min, max, pas, cle, gauche, droite) {
+    var r = h('input', { type: 'range', min: min, max: max, step: pas, value: L[cle], 'aria-label': label, oninput: function () { L[cle] = parseFloat(r.value); maj(); } });
+    return [h('label', { 'class': 'lab' }, label), r, h('div', { 'class': 'echelle' }, h('span', null, gauche), h('span', null, droite))];
+  }
+  var pol = h('div', { 'class': 'polices' });
+  Object.keys(POLICES).forEach(function (k) {
+    var b = h('button', { type: 'button', 'class': L.police === k ? 'on' : '', style: 'font-family:' + POLICES[k], onclick: function () {
+      L.police = k; var bs = pol.querySelectorAll('button'); for (var i = 0; i < bs.length; i++) bs[i].className = ''; b.className = 'on'; maj();
+    } }, k === 'Atkinson' ? 'Atkinson' : k);
+    pol.appendChild(b);
+  });
+  var fd = h('div', { 'class': 'fonds' });
+  Object.keys(FONDS).forEach(function (k) {
+    var b = h('button', { type: 'button', 'class': 'fond' + (L.fond === k ? ' on' : ''), style: 'background:' + FONDS[k], 'aria-label': 'Fond ' + k, onclick: function () {
+      L.fond = k; var bs = fd.querySelectorAll('button'); for (var i = 0; i < bs.length; i++) bs[i].className = 'fond'; b.className = 'fond on'; maj();
+    } });
+    fd.appendChild(b);
+  });
+  ajoute(c, [
+    h('label', { 'class': 'lab' }, 'Police'), pol,
+    curseur('Taille du texte', 16, 32, 1, 'taille', 'petit', 'grand'),
+    curseur('Espace entre les lignes', 1.3, 2.4, 0.1, 'interligne', 'serré', 'aéré'),
+    curseur('Espace entre les lettres', 0, 0.2, 0.01, 'lettres', 'normal', 'large'),
+    curseur('Espace entre les mots', 0, 0.6, 0.02, 'mots', 'normal', 'large'),
+    h('label', { 'class': 'lab' }, 'Couleur du fond'), fd,
+    h('p', { 'class': 'apercu lisible' }, 'Le vieux phare se dressait au bout de la jetée.'),
+    h('div', { 'class': 'rang' }, btn('Revenir aux réglages conseillés', 'reprendre', function () {
+      S.lecture = clone(DEFAUT.lecture); appliquerTheme(); sauver(); vider(c); controlesLecture(c, apres); if (apres) apres();
+    }, 'petit')),
+    h('p', { 'class': 'note' }, 'Lexend, Atkinson Hyperlegible et Andika sont des polices pensées pour la lisibilité. Teste-les : la meilleure est celle avec laquelle TU lis le plus confortablement.')
+  ]);
+}
+function basculerAa(ev) { if (ev) ev.stopPropagation(); var p = $('#pop'); if (p.hidden) ouvrirAa(); else fermerAa(); }
+function ouvrirAa() {
+  var p = $('#pop'); vider(p);
+  p.appendChild(h('div', { 'class': 'rang', style: 'margin:0;justify-content:space-between' },
+    h('div', { 'class': 'titre', style: 'margin:0' }, 'Confort de lecture'),
+    h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Fermer', onclick: fermerAa }, ico('croix'))));
+  controlesLecture(p);
+  p.hidden = false;
+}
+function fermerAa() { var p = $('#pop'); if (p) p.hidden = true; }
+document.addEventListener('click', function (e) {
+  var p = $('#pop');
+  if (!p.hidden && !p.contains(e.target) && e.target.id !== 'btnAa') fermerAa();
+});
+document.addEventListener('keydown', function (e) { if (e.keyCode === 27) { fermerAa(); fermerPlein(); } });
+
+/* =========================================================
+   LAME 1 — Lecteur
+   ========================================================= */
+var EXEMPLES = {
+  fr: "Le vieux phare se dressait au bout de la jetée. Chaque soir, Lina montait les cent vingt marches pour allumer la grande lampe. Ce soir-là, une silhouette l'attendait en haut de l'escalier. Elle retint son souffle : qui pouvait bien être là ?",
+  en: "Every morning, Sam walks his dog to the park. He usually takes a ball and a bottle of water. Today, it is raining, so he is wearing his yellow raincoat. Is the dog happy? Of course! He loves the rain."
+};
+var RE_MOT = /[A-Za-zÀ-ÖØ-öø-ÿŒœÆæ0-9]+(?:['’\-][A-Za-zÀ-ÖØ-öø-ÿŒœÆæ0-9]+)*/g;
+function phrases(txt) {
+  var segs = [], debut = 0, i, j, c;
+  for (i = 0; i < txt.length; i++) {
+    c = txt.charAt(i);
+    if ('.!?…'.indexOf(c) >= 0 || c === '\n' || c === ';' || c === ':') {
+      j = i + 1;
+      while (j < txt.length && '.!?…»”")'.indexOf(txt.charAt(j)) >= 0) j++;
+      if (/[A-Za-zÀ-ÿ0-9]/.test(txt.slice(debut, j))) segs.push({ s: debut, e: j });
+      debut = j; i = j - 1;
+    }
+  }
+  if (debut < txt.length && /[A-Za-zÀ-ÿ0-9]/.test(txt.slice(debut))) segs.push({ s: debut, e: txt.length });
+  return segs;
+}
+function texteAvecMots(zone, txt, clic) {
+  var spans = [], dernier = 0, m;
+  function trou(t) {
+    var parts = t.split('\n');
+    parts.forEach(function (p, k) { if (k > 0) zone.appendChild(h('br')); if (p) zone.appendChild(document.createTextNode(p)); });
+  }
+  RE_MOT.lastIndex = 0;
+  while ((m = RE_MOT.exec(txt)) !== null) {
+    trou(txt.slice(dernier, m.index));
+    var sp = h('span', { 'class': 'mot' }, m[0]);
+    sp._s = m.index; sp._e = m.index + m[0].length;
+    if (clic) sp.addEventListener('click', (function (s) { return function () { clic(s); }; })(sp));
+    zone.appendChild(sp); spans.push(sp);
+    dernier = m.index + m[0].length;
+  }
+  trou(txt.slice(dernier));
+  return spans;
+}
+function rLecteur(sh) {
+  var st = S.lecteur, mode = st.texte.trim() ? 'lire' : 'ecrire';
+  function dessiner() { TTS.stop(); vider(sh); if (mode === 'ecrire') ecrire(); else lire(); }
+  function ecrire() {
+    var ta = h('textarea', { 'class': 'lisible', rows: '9', placeholder: 'Colle ou écris ton texte ici…', value: st.texte, 'aria-label': 'Texte à écouter', oninput: function () { st.texte = ta.value; sauver(); bLire.disabled = !ta.value.trim(); } });
+    var bLire = btn('Écouter ce texte', 'lire', function () { mode = 'lire'; dessiner(); }, 'prim gros', { disabled: !st.texte.trim() });
+    ajoute(sh, [
+      h('div', { 'class': 'titre' }, 'Ton texte'),
+      h('p', { 'class': 'aide' }, 'Colle un texte (Ctrl + V), tape-le, ou essaie avec l’exemple.'),
+      h('div', { 'class': 'rang' }, h('span', null, 'Langue du texte :'), choix([['fr', 'Français'], ['en', 'English']], st.lang, function (l) { st.lang = l; sauver(); })),
+      ta,
+      h('div', { 'class': 'rang' }, bLire,
+        btn('Exemple', null, function () { ta.value = EXEMPLES[st.lang]; st.texte = ta.value; sauver(); bLire.disabled = false; }),
+        btn('Effacer', 'poubelle', function () { ta.value = ''; st.texte = ''; sauver(); bLire.disabled = true; ta.focus(); }))
+    ]);
+  }
+  function lire() {
+    var txt = st.texte, segs = phrases(txt), joue = false, cur = 0, dernierePos = null, motOn = null, phrOn = [];
+    var zone = h('div', { 'class': 'zone lisible', 'aria-live': 'off' });
+    var spans = texteAvecMots(zone, txt, function (sp) { jouer(sp._s); });
+    var rg = regle(zone);
+    function motA(pos) {
+      dernierePos = pos;
+      if (motOn) motOn.classList.remove('mot-on');
+      motOn = trouve(spans, function (s) { return s._s <= pos && pos < s._e; }) || trouve(spans, function (s) { return s._s >= pos; });
+      if (motOn) { motOn.classList.add('mot-on'); if (st.suivre && motOn.scrollIntoView) motOn.scrollIntoView({ block: 'nearest' }); }
+    }
+    function phrase(i) {
+      phrOn.forEach(function (s) { s.classList.remove('phrase-on'); });
+      phrOn = spans.filter(function (s) { return s._s >= segs[i].s && s._e <= segs[i].e; });
+      phrOn.forEach(function (s) { s.classList.add('phrase-on'); });
+    }
+    function effacer() { if (motOn) motOn.classList.remove('mot-on'); motOn = null; phrOn.forEach(function (s) { s.classList.remove('phrase-on'); }); phrOn = []; }
+    function etape(i, depuis, j) {
+      if (j !== TTS.jeton) return;
+      if (i >= segs.length) { joue = false; cur = 0; dernierePos = null; effacer(); majBoutons(); return; }
+      cur = i;
+      var seg = segs[i], d = (depuis !== null && depuis > seg.s && depuis < seg.e) ? depuis : seg.s;
+      var u = TTS.enonce(txt.slice(d, seg.e), st.lang, st.vitesse);
+      u.onstart = function () { if (j !== TTS.jeton) return; phrase(i); motA(d); };
+      u.onboundary = function (e) { if (j !== TTS.jeton) return; if (e.name && e.name !== 'word') return; motA(d + e.charIndex); };
+      u.onend = function () { if (j !== TTS.jeton) return; etape(i + 1, null, j); };
+      u.onerror = function (e) { if (j !== TTS.jeton) return; if (e && (e.error === 'interrupted' || e.error === 'canceled')) return; etape(i + 1, null, j); };
+      window.speechSynthesis.speak(u);
+    }
+    function jouer(depuis) {
+      if (!TTS.ok) return;
+      TTS.stop(); var j = TTS.jeton; joue = true; majBoutons();
+      var i = 0;
+      if (depuis !== null && depuis !== undefined) { i = indexDe(segs, function (s) { return depuis >= s.s && depuis < s.e; }); if (i < 0) i = 0; }
+      setTimeout(function () { etape(i, depuis === undefined ? null : depuis, j); }, 90);
+    }
+    function pause() { TTS.stop(); joue = false; majBoutons(); }
+    function stop() { TTS.stop(); joue = false; cur = 0; dernierePos = null; effacer(); majBoutons(); }
+    var bJouer = h('button', { 'class': 'btn prim gros', type: 'button', onclick: function () { if (joue) pause(); else jouer(dernierePos !== null ? dernierePos : (cur ? segs[cur].s : null)); } });
+    function majBoutons() { vider(bJouer); ajoute(bJouer, joue ? [ico('pausebtn'), 'Pause'] : [ico('lire'), dernierePos !== null ? 'Reprendre' : 'Écouter']); }
+    majBoutons();
+    var selVoix = h('select', { 'aria-label': 'Voix', onchange: function () { st.voix[st.lang] = selVoix.value; sauver(); } });
+    function remplirVoix() {
+      vider(selVoix);
+      var l = TTS.pour(st.lang), v = TTS.choisir(st.lang);
+      if (!l.length) selVoix.appendChild(h('option', { value: '' }, st.lang === 'en' ? 'Aucune voix anglaise trouvée' : 'Aucune voix française trouvée'));
+      l.forEach(function (x) { var o = h('option', { value: x.name }, x.name.replace(/Microsoft |Google /, '') + (x.localService ? '' : ' (en ligne)')); if (v && v.name === x.name) o.selected = true; selVoix.appendChild(o); });
+    }
+    remplirVoix(); TTS.surChange = remplirVoix;
+    var vit = h('input', { type: 'range', min: '0.5', max: '1.4', step: '0.05', value: st.vitesse, 'aria-label': 'Vitesse de lecture', onchange: function () { st.vitesse = parseFloat(vit.value); sauver(); } });
+    if (!TTS.ok) sh.appendChild(h('div', { 'class': 'alerte' }, 'Ce navigateur ne sait pas lire à voix haute. Essaie avec Chrome ou Edge. Tu peux quand même utiliser la règle de lecture.'));
+    ajoute(sh, [
+      h('div', { 'class': 'rang' }, bJouer, btn('Stop', 'stop', stop), btn('Modifier le texte', 'crayon', function () { mode = 'ecrire'; dessiner(); })),
+      h('p', { 'class': 'aide' }, 'Astuce : touche un mot pour que la lecture reparte de là.'),
+      zone,
+      h('div', { 'class': 'grille2', style: 'margin-top:12px' },
+        h('div', null, h('label', { 'class': 'lab' }, 'Vitesse'), vit, h('div', { 'class': 'echelle' }, h('span', null, 'lente'), h('span', null, 'normale'), h('span', null, 'rapide'))),
+        h('div', null, h('label', { 'class': 'lab' }, 'Voix'), selVoix)),
+      h('div', { 'class': 'rang' }, h('span', null, 'Langue :'), choix([['fr', 'Français'], ['en', 'English']], st.lang, function (l) { st.lang = l; sauver(); stop(); remplirVoix(); })),
+      bascule('Règle de lecture (elle suit ton doigt ou ta souris)', false, function (on) { rg.basculer(on); }),
+      bascule('Faire défiler pour suivre le mot lu', st.suivre, function (on) { st.suivre = on; sauver(); }),
+      st.lang === 'fr' ? h('div', { 'class': 'rang' }, btn('Colorer les syllabes de ce texte', 'syllabes', function () { S.syl.texte = st.texte; sauver(); aller('syllabes'); }, 'petit')) : null
+    ]);
+  }
+  nettoyages.push(function () { TTS.stop(); });
+  dessiner();
+}
+
+/* =========================================================
+   LAME 2 — Syllabes (français)
+   ========================================================= */
+var VOY = 'aeiouyàâäéèêëîïôöùûüÿœæ';
+function estV(c) { return c !== '' && VOY.indexOf(c) >= 0; }
+var NAS3 = ['ain', 'ein', 'oin', 'aim', 'ien', 'yen'], VG3 = ['eau', 'oeu', 'œu'];
+var NAS2 = ['an', 'am', 'en', 'em', 'in', 'im', 'on', 'om', 'un', 'um', 'yn', 'ym'];
+var VG2 = ['ou', 'oi', 'ai', 'ei', 'au', 'eu', 'où', 'oû', 'aî', 'oî'];
+var CG = ['ch', 'ph', 'gn', 'th', 'rh', 'sh', 'ck'];
+function unites(m) {
+  var u = [], i = 0, n = m.length, c, t2, t3, nx;
+  while (i < n) {
+    c = m.charAt(i); t2 = m.substr(i, 2); t3 = m.substr(i, 3);
+    if (!estV(c)) {
+      if (t2 === 'qu' || (t2 === 'gu' && 'eiéèêëy'.indexOf(m.charAt(i + 2)) >= 0 && i + 2 < n)) { u.push({ t: t2, v: 0 }); i += 2; continue; }
+      if (CG.indexOf(t2) >= 0) { u.push({ t: t2, v: 0 }); i += 2; continue; }
+      if (t2 === 'll' && i > 0 && m.charAt(i - 1) === 'i') { u.push({ t: t2, v: 0 }); i += 2; continue; }
+      u.push({ t: c, v: 0 }); i++; continue;
+    }
+    if (NAS3.indexOf(t3) >= 0) { nx = m.charAt(i + 3); if (!nx || (!estV(nx) && nx !== 'n' && nx !== 'm')) { u.push({ t: t3, v: 1 }); i += 3; continue; } }
+    if (VG3.indexOf(t3) >= 0) { u.push({ t: t3, v: 1 }); i += 3; continue; }
+    if (NAS2.indexOf(t2) >= 0) { nx = m.charAt(i + 2); if (!nx || (!estV(nx) && nx !== 'n' && nx !== 'm')) { u.push({ t: t2, v: 1 }); i += 2; continue; } }
+    if (VG2.indexOf(t2) >= 0) { u.push({ t: t2, v: 1 }); i += 2; continue; }
+    if (c === 'y' && i > 0 && estV(m.charAt(i - 1)) && estV(m.charAt(i + 1))) { u.push({ t: c, v: 0 }); i++; continue; }
+    u.push({ t: c, v: 1 }); i++;
+  }
+  return u;
+}
+function insep(a, b) {
+  return (b === 'r' || b === 'l') && ['b', 'c', 'd', 'f', 'g', 'k', 'p', 't', 'v', 'ch', 'ph', 'th'].indexOf(a) >= 0 && !((a === 'd' || a === 't' || a === 'v') && b === 'l');
+}
+function decouper(u) {
+  var vi = [], i, k, coupes = [], res = [], cur = [];
+  for (i = 0; i < u.length; i++) if (u[i].v) vi.push(i);
+  if (vi.length < 2) return [u];
+  for (k = 0; k < vi.length - 1; k++) {
+    var a = vi[k], b = vi[k + 1], nb = b - a - 1, cut;
+    if (nb === 0) {
+      var fin = u.slice(b + 1).map(function (x) { return x.t; }).join('');
+      if (k === vi.length - 2 && u[b].t === 'e' && (fin === '' || fin === 's' || fin === 'nt')) continue;
+      cut = b;
+    } else if (nb === 1) cut = a + 1;
+    else if (nb === 2) cut = insep(u[a + 1].t, u[a + 2].t) ? a + 1 : a + 2;
+    else cut = insep(u[b - 2].t, u[b - 1].t) ? b - 2 : b - 1;
+    coupes.push(cut);
+  }
+  for (i = 0; i < u.length; i++) { if (coupes.indexOf(i) >= 0 && cur.length) { res.push(cur); cur = []; } cur.push(u[i]); }
+  if (cur.length) res.push(cur);
+  return res;
+}
+var SANS_MUETTE = ['bus', 'os', 'ours', 'mars', 'tennis', 'sud', 'net', 'cap', 'gaz', 'ouest', 'fils', 'tous', 'sens', 'bis', 'oasis', 'autobus', 'cactus', 'virus', 'lotus', 'hélas', 'as', 'jadis', 'maïs', 'vis', 'sept', 'huit', 'but', 'dot', 'brut', 'zut', 'fax', 'index', 'lynx', 'sphinx', 'box', 'top', 'stop', 'hop', 'cep', 'atlas', 'bonus', 'campus', 'chorus', 'iris', 'métis', 'plus', 'tournevis', 'express', 'six', 'dix', 'cassis', 'lys', 'hamster', 'ski', 'kayak', 'bob'];
+function muettes(mot, nbV) {
+  var idx = {}, n = mot.length, d = mot.charAt(n - 1), avd = mot.charAt(n - 2);
+  if (mot.charAt(0) === 'h' && n > 1) idx[0] = 1;
+  if (n < 3 || SANS_MUETTE.indexOf(mot) >= 0) return idx;
+  if (nbV >= 2 && d === 'e') idx[n - 1] = 1;
+  if (nbV >= 2 && d === 's' && avd === 'e') { idx[n - 1] = 1; idx[n - 2] = 1; return idx; }
+  if ('stdxzp'.indexOf(d) >= 0) {
+    idx[n - 1] = 1;
+    // « petits », « grands », « temps » : la consonne d'avant est muette aussi
+    if ((d === 's' || d === 'x') && 'tdp'.indexOf(avd) >= 0 && n > 3) idx[n - 2] = 1;
+  }
+  return idx;
+}
+function colorerMot(mot, opts) {
+  var bas = mot.toLowerCase(), w = h('span', { 'class': 'w' }), u, syl, pos = 0, nbV = 0, mu, si, k, c;
+  if (bas.length !== mot.length) { w.textContent = mot; return w; }
+  u = unites(bas); syl = decouper(u);
+  u.forEach(function (x) { if (x.v) nbV++; });
+  mu = opts.muettes ? muettes(bas, nbV) : {};
+  for (si = 0; si < syl.length; si++) {
+    var sp = h('span', { 'class': 'sy s' + (si % 2) });
+    for (k = 0; k < syl[si].length; k++) {
+      var un = syl[si][k], cible = sp, j;
+      if (opts.sons && un.t.length > 1) { cible = h('span', { 'class': 'son' }); sp.appendChild(cible); }
+      for (j = 0; j < un.t.length; j++) {
+        c = mot.charAt(pos);
+        if (mu[pos]) cible.appendChild(h('span', { 'class': 'muet' }, c)); else cible.appendChild(document.createTextNode(c));
+        pos++;
+      }
+    }
+    w.appendChild(sp);
+  }
+  w.addEventListener('click', function () { TTS.dire(mot, 'fr'); });
+  return w;
+}
+function rSyllabes(sh) {
+  var st = S.syl, sortie, rg, tm = null;
+  var ta = h('textarea', { 'class': 'lisible', rows: '4', placeholder: 'Écris ou colle un texte en français…', value: st.texte, 'aria-label': 'Texte à découper en syllabes', oninput: function () { st.texte = ta.value; sauver(); clearTimeout(tm); tm = setTimeout(rendre, 160); } });
+  function rendre() {
+    vider(sortie);
+    sortie.className = 'zone lisible syl' + (st.mode === 'arcs' ? ' arcs' : '');
+    var txt = st.texte, re = /[A-Za-zÀ-ÖØ-öø-ÿŒœÆæ]+/g, m, dernier = 0;
+    function trou(t) { t.split('\n').forEach(function (p, k) { if (k > 0) sortie.appendChild(h('br')); if (p) sortie.appendChild(document.createTextNode(p)); }); }
+    if (!txt.trim()) { sortie.appendChild(h('span', { style: 'color:var(--ink2)' }, 'Le texte découpé apparaîtra ici.')); }
+    while ((m = re.exec(txt)) !== null) { trou(txt.slice(dernier, m.index)); sortie.appendChild(colorerMot(m[0], st)); dernier = m.index + m[0].length; }
+    trou(txt.slice(dernier));
+    if (rg) rg.rafraichir();
+  }
+  var pals = h('div', { 'class': 'palettes' });
+  PALETTES.forEach(function (p, i) {
+    var b = h('button', { type: 'button', 'class': 'palette' + (st.palette === i ? ' on' : ''), 'aria-label': 'Couleurs ' + (i + 1), onclick: function () {
+      st.palette = i; sauver(); appliquerTheme(); var bs = pals.querySelectorAll('button'); for (var k = 0; k < bs.length; k++) bs[k].className = 'palette'; b.className = 'palette on';
+    } }, h('i', { style: 'background:' + p[0] }), h('i', { style: 'background:' + p[1] }));
+    pals.appendChild(b);
+  });
+  sortie = h('div', { 'class': 'zone lisible syl' });
+  rg = regle(sortie);
+  ajoute(sh, [
+    h('div', { 'class': 'titre' }, 'Texte'),
+    ta,
+    h('div', { 'class': 'rang' },
+      btn('Exemple', null, function () { ta.value = EXEMPLES.fr; st.texte = ta.value; sauver(); rendre(); }, 'petit'),
+      btn('Effacer', 'poubelle', function () { ta.value = ''; st.texte = ''; sauver(); rendre(); ta.focus(); }, 'petit')),
+    h('div', { 'class': 'titre' }, 'Texte découpé'),
+    h('p', { 'class': 'aide' }, 'Touche un mot pour l’entendre.'),
+    sortie,
+    h('div', { 'class': 'rang', style: 'margin-top:16px' }, h('span', null, 'Affichage :'), choix([['couleurs', 'Couleurs'], ['arcs', 'Arcs']], st.mode, function (m) { st.mode = m; sauver(); rendre(); })),
+    h('div', { 'class': 'rang' }, h('span', null, 'Couleurs :'), pals),
+    bascule('Griser les lettres muettes', st.muettes, function (on) { st.muettes = on; sauver(); rendre(); }),
+    bascule('Souligner les sons à plusieurs lettres (ou, an, ch…)', st.sons, function (on) { st.sons = on; sauver(); rendre(); }),
+    bascule('Règle de lecture', false, function (on) { rg.basculer(on); }),
+    h('p', { 'class': 'note' }, 'Le découpage est automatique : il est juste pour la grande majorité des mots, mais il peut se tromper sur quelques mots rares ou irréguliers.')
+  ]);
+  nettoyages.push(function () { clearTimeout(tm); });
+  rendre();
+}
+
+/* =========================================================
+   LAME 3 — Décodeur de consignes
+   ========================================================= */
+var CATS = {
+  chercher: { nom: 'Chercher dans le document', c: '#2B6CB0', ic: 'consignes' },
+  expliquer: { nom: 'Comprendre et expliquer', c: '#A8631A', ic: 'bulle' },
+  ecrire: { nom: 'Écrire, rédiger', c: '#2F7A50', ic: 'crayon' },
+  marquer: { nom: 'Agir sur la feuille', c: '#B5212B', ic: 'marque' },
+  calculer: { nom: 'Calculer, construire', c: '#22706F', ic: 'calc' },
+  trier: { nom: 'Trier, organiser', c: '#7B4F2C', ic: 'blocs' }
+};
+var VERBES = [
+  { v: 'Relever', f: ['relève', 'relevez', 'relever', 'relevons'], c: 'chercher', a: 'Trouver dans le document des mots ou des phrases précis, et les recopier.', s: ['Repère le passage qui parle du sujet demandé.', 'Recopie les mots exacts, entre guillemets « ».', 'Ajoute le numéro de ligne : (l. 12).'], x: 'Relève deux adjectifs qui décrivent la maison. → « sombre » (l. 3), « immense » (l. 5)', p: 'Ne change pas les mots : on veut ceux du texte, pas les tiens.' },
+  { v: 'Repérer', f: ['repère', 'repérez', 'repérer'], c: 'chercher', a: 'Trouver un élément et montrer où il se trouve.', s: ['Lis la question pour savoir ce que tu cherches.', 'Parcours le document avec ton doigt ou la règle.', 'Montre-le : souligne-le ou note sa ligne.'], x: 'Repère le narrateur. → C’est Lucas : il dit « je » (l. 1).', p: 'Repérer, ce n’est pas expliquer : reste court.' },
+  { v: 'Identifier', f: ['identifie', 'identifiez', 'identifier'], c: 'chercher', a: 'Dire précisément ce qu’est quelque chose (sa nature, son nom).', s: ['Observe l’élément demandé.', 'Donne son nom exact (par exemple : « c’est une métaphore »).', 'Si possible, prouve-le avec un indice.'], x: 'Identifie le temps du verbe « partit ». → Passé simple.', p: 'Donne le mot précis, pas une description floue.' },
+  { v: 'Citer', f: ['cite', 'citez', 'citer'], c: 'chercher', a: 'Recopier exactement un passage du texte.', s: ['Trouve le passage.', 'Recopie-le mot pour mot.', 'Mets-le entre guillemets « » et indique la ligne.'], x: 'Cite la phrase qui montre sa peur. → « Il tremblait de tout son corps » (l. 8)', p: 'Sans guillemets, ce n’est plus une citation.' },
+  { v: 'Retrouver', f: ['retrouve', 'retrouvez', 'retrouver'], c: 'chercher', a: 'Chercher une information qui est écrite dans le document.', s: ['Note le mot-clé de la question.', 'Cherche ce mot-clé (ou un synonyme) dans le document.', 'Recopie ou reformule l’information trouvée.'], x: 'Retrouve l’année de la découverte. → 1922.', p: 'La réponse est dans le document : pas besoin d’inventer.' },
+  { v: 'Observer', f: ['observe', 'observez', 'observer'], c: 'chercher', a: 'Regarder attentivement un document (image, carte, schéma) avant de répondre.', s: ['Lis le titre, la légende et la source.', 'Regarde l’ensemble, puis les détails.', 'Note ce que tu vois avant d’interpréter.'], x: 'Observe la carte. → Je vois que les grandes villes sont près des côtes.', p: 'Observer prépare souvent la question suivante : garde tes notes.' },
+  { v: 'Nommer', f: ['nomme', 'nommez', 'nommer'], c: 'chercher', a: 'Donner le nom exact de quelque chose.', s: ['Trouve l’élément.', 'Écris son nom précis, avec le vocabulaire de la matière.'], x: 'Nomme l’organe qui pompe le sang. → Le cœur.', p: 'Un mot ou un groupe de mots suffit.' },
+  { v: 'Indiquer', f: ['indique', 'indiquez', 'indiquer'], c: 'chercher', a: 'Donner une information courte et précise.', s: ['Trouve l’information demandée.', 'Écris-la clairement, en une phrase courte.'], x: 'Indique où se passe la scène. → La scène se passe dans une forêt.', p: 'Pas besoin d’expliquer pourquoi, sauf si on te le demande.' },
+  { v: 'Situer', f: ['situe', 'situez', 'situer', 'localise', 'localisez', 'localiser'], c: 'chercher', a: 'Placer quelque chose dans le temps (une date) ou dans l’espace (un lieu).', s: ['Dans le temps : donne la date, le siècle ou la période.', 'Dans l’espace : donne le lieu et utilise des repères (nord, sud, continent…).'], x: 'Situe Paris. → Au nord de la France, sur la Seine.', p: 'Utilise des repères précis : avant/après, nord/sud, siècle.' },
+  { v: 'Souligner', f: ['souligne', 'soulignez', 'souligner'], c: 'marquer', a: 'Tracer un trait sous des mots, à la règle.', s: ['Trouve les mots demandés.', 'Trace un trait bien droit sous chacun, à la règle.', 'Utilise la couleur demandée s’il y en a une.'], x: 'Souligne les verbes conjugués. → Le chat mange une souris (on souligne « mange »).', p: 'Souligne seulement ce qui est demandé, pas toute la phrase.' },
+  { v: 'Entourer', f: ['entoure', 'entourez', 'entourer'], c: 'marquer', a: 'Faire un rond autour d’un mot ou d’une réponse.', s: ['Trouve l’élément demandé.', 'Fais un rond bien fermé autour.'], x: 'Entoure la bonne réponse.', p: 'Si tu changes d’avis, barre proprement et entoure l’autre.' },
+  { v: 'Surligner', f: ['surligne', 'surlignez', 'surligner'], c: 'marquer', a: 'Colorier des mots avec un surligneur.', s: ['Lis d’abord le passage en entier.', 'Surligne seulement les mots importants.'], x: 'Surligne les mots qui parlent de la météo.', p: 'Tout surligner revient à ne rien mettre en valeur.' },
+  { v: 'Encadrer', f: ['encadre', 'encadrez', 'encadrer'], c: 'marquer', a: 'Tracer un rectangle autour d’un mot ou d’un résultat.', s: ['Trouve l’élément.', 'Trace un rectangle à la règle autour.'], x: 'Encadre le résultat final.', p: 'Encadrer sert à faire ressortir : en général un seul élément.' },
+  { v: 'Cocher', f: ['coche', 'cochez', 'cocher'], c: 'marquer', a: 'Mettre une croix dans la bonne case.', s: ['Lis toutes les propositions avant de choisir.', 'Coche la ou les bonnes cases.'], x: 'Coche la bonne réponse : vrai ou faux.', p: 'Vérifie si on demande UNE réponse ou PLUSIEURS.' },
+  { v: 'Compléter', f: ['complète', 'complétez', 'compléter'], c: 'ecrire', a: 'Remplir les espaces vides avec le bon mot.', s: ['Lis toute la phrase avant de remplir.', 'Cherche le mot qui manque (le sens et la grammaire).', 'Relis la phrase complète.'], x: 'Complète : Hier, nous ___ (aller) au cinéma. → sommes allés', p: 'Vérifie l’accord : le mot doit aller avec le reste de la phrase.' },
+  { v: 'Recopier', f: ['recopie', 'recopiez', 'recopier', 'copie', 'copiez', 'copier'], c: 'ecrire', a: 'Écrire exactement la même chose, sans erreur.', s: ['Lis un petit morceau (3 ou 4 mots).', 'Écris-le.', 'Vérifie lettre par lettre avant de passer à la suite.'], x: 'Recopie la phrase du tableau.', p: 'Ne copie pas lettre par lettre : prends des petits groupes de mots.' },
+  { v: 'Rédiger', f: ['rédige', 'rédigez', 'rédiger'], c: 'ecrire', a: 'Écrire un texte organisé, avec des phrases complètes.', s: ['Note tes idées au brouillon.', 'Range-les dans l’ordre.', 'Écris des phrases complètes avec des mots de liaison (d’abord, ensuite, enfin).', 'Relis-toi.'], x: 'Rédige un paragraphe sur ton héros préféré.', p: 'Une liste de mots n’est pas un texte rédigé.' },
+  { v: 'Écrire', f: ['écris', 'écrivez', 'écrire'], c: 'ecrire', a: 'Produire un texte ou une réponse par écrit.', s: ['Vérifie la longueur demandée (lignes, mots).', 'Prépare au brouillon.', 'Écris, puis relis.'], x: 'Écris 5 lignes sur tes vacances.', p: 'Respecte la longueur et le sujet demandés.' },
+  { v: 'Résumer', f: ['résume', 'résumez', 'résumer'], c: 'ecrire', a: 'Dire l’essentiel en beaucoup moins de mots, avec tes propres mots.', s: ['Repère qui, quoi, où, quand.', 'Garde seulement les événements importants.', 'Écris quelques phrases avec tes mots.'], x: 'Résume le chapitre en 3 phrases.', p: 'Pas de détails, pas d’avis personnel, pas de citation.' },
+  { v: 'Conjuguer', f: ['conjugue', 'conjuguez', 'conjuguer'], c: 'ecrire', a: 'Écrire un verbe au bon temps et à la bonne personne.', s: ['Trouve l’infinitif et le groupe du verbe.', 'Repère le temps demandé et le sujet.', 'Écris la terminaison (vérifie dans ta fiche).'], x: 'Conjugue « finir » au présent avec « nous ». → nous finissons', p: 'La terminaison dépend du sujet : cherche-le bien.' },
+  { v: 'Transformer', f: ['transforme', 'transformez', 'transformer', 'réécris', 'réécrivez', 'réécrire'], c: 'ecrire', a: 'Changer une phrase selon une règle (temps, forme, nombre…).', s: ['Repère ce qu’il faut changer.', 'Change seulement cet élément.', 'Vérifie les accords qui changent avec lui.'], x: 'Transforme au pluriel : Le chat dort. → Les chats dorment.', p: 'Un changement en entraîne souvent d’autres (les accords).' },
+  { v: 'Traduire', f: ['traduis', 'traduisez', 'traduire'], c: 'ecrire', a: 'Faire passer un texte d’une langue à l’autre en gardant le sens.', s: ['Lis toute la phrase pour comprendre le sens.', 'Traduis groupe de mots par groupe de mots.', 'Relis : est-ce que ça sonne naturel ?'], x: 'Traduis : I’m hungry. → J’ai faim.', p: 'Le mot à mot donne souvent une phrase bizarre : pense au sens.' },
+  { v: 'Décrire', f: ['décris', 'décrivez', 'décrire'], c: 'expliquer', a: 'Dire ce que l’on voit ou ce qui se passe, avec précision, sans donner son avis.', s: ['Observe du général vers les détails.', 'Utilise des mots précis (couleurs, formes, lieux).', 'Organise : d’abord, au premier plan, à droite…'], x: 'Décris le personnage. → C’est un vieil homme, grand, aux cheveux blancs.', p: 'Décrire, c’est dire CE QUI est, pas POURQUOI.' },
+  { v: 'Expliquer', f: ['explique', 'expliquez', 'expliquer'], c: 'expliquer', a: 'Faire comprendre POURQUOI ou COMMENT quelque chose se passe.', s: ['Dis ce qui se passe.', 'Donne la raison avec « car », « parce que », « donc ».', 'Appuie-toi sur le document ou sur la leçon.'], x: 'Explique pourquoi il fuit. → Il fuit parce qu’il a peur du loup (l. 4).', p: 'Répéter la question, ce n’est pas expliquer : il faut un « parce que ».' },
+  { v: 'Justifier', f: ['justifie', 'justifiez', 'justifier'], c: 'expliquer', a: 'Prouver que ta réponse est juste, avec un exemple ou une citation.', s: ['Donne ta réponse.', 'Ajoute la preuve : une citation, un chiffre, une règle.', 'Relie les deux : « car », « comme le montre… ».'], x: 'Est-il triste ? Justifie. → Oui, car il « pleure en silence » (l. 7).', p: 'Sans preuve, la réponse ne rapporte pas tous les points.' },
+  { v: 'Comparer', f: ['compare', 'comparez', 'comparer'], c: 'expliquer', a: 'Trouver les ressemblances ET les différences entre deux choses.', s: ['Fais deux colonnes : points communs / différences.', 'Remplis-les.', 'Écris avec « alors que », « comme », « contrairement à ».'], x: 'Compare les deux personnages. → Tous deux sont courageux, mais Léa est plus prudente que Tom.', p: 'Parle des DEUX éléments à chaque fois.' },
+  { v: 'Analyser', f: ['analyse', 'analysez', 'analyser'], c: 'expliquer', a: 'Étudier en détail les éléments d’un document pour comprendre comment il fonctionne.', s: ['Découpe le document en parties.', 'Observe chaque partie.', 'Dis ce que chaque élément apporte au sens.'], x: 'Analyse le titre. → Le mot « dernier » annonce une fin.', p: 'Ne te contente pas de décrire : dis à quoi ça sert.' },
+  { v: 'Déduire', f: ['déduis', 'déduisez', 'déduire'], c: 'expliquer', a: 'Trouver une information qui n’est pas écrite, grâce à des indices.', s: ['Rassemble les indices du document.', 'Assemble-les comme un détective.', 'Écris ta conclusion : « donc… ».'], x: 'Déduis la saison. → Il neige et il fait froid, donc c’est l’hiver.', p: 'Ta déduction doit s’appuyer sur des indices précis.' },
+  { v: 'Interpréter', f: ['interprète', 'interprétez', 'interpréter'], c: 'expliquer', a: 'Donner le sens caché ou le message d’un document.', s: ['Comprends d’abord le sens de base.', 'Cherche ce que l’auteur veut faire comprendre.', 'Justifie avec un élément du document.'], x: 'Interprète la fin. → Le soleil qui se lève montre l’espoir.', p: 'Il peut y avoir plusieurs interprétations : défends la tienne avec une preuve.' },
+  { v: 'Argumenter', f: ['argumente', 'argumentez', 'argumenter'], c: 'expliquer', a: 'Défendre une opinion avec des arguments et des exemples.', s: ['Donne ton avis clairement.', 'Ajoute 2 arguments (« d’abord », « ensuite »).', 'Illustre chaque argument par un exemple.', 'Conclus.'], x: 'Faut-il interdire les téléphones au collège ? Argumente.', p: 'Un argument sans exemple est faible.' },
+  { v: 'Conclure', f: ['conclus', 'concluez', 'conclure'], c: 'expliquer', a: 'Dire ce que l’on retient à la fin d’un travail.', s: ['Relis tes réponses précédentes.', 'Écris le résultat principal en une ou deux phrases.'], x: 'Conclus l’expérience. → L’eau bout à 100 °C.', p: 'Pas d’idée nouvelle dans une conclusion.' },
+  { v: 'Définir', f: ['définis', 'définissez', 'définir'], c: 'expliquer', a: 'Dire précisément ce que veut dire un mot.', s: ['Commence par « c’est… » ou « c’est un… ».', 'Donne la famille du mot, puis ce qui le rend unique.'], x: 'Définis « démocratie ». → C’est un régime où le peuple choisit ses dirigeants.', p: 'N’utilise pas le mot lui-même dans sa définition.' },
+  { v: 'Présenter', f: ['présente', 'présentez', 'présenter'], c: 'expliquer', a: 'Donner les informations essentielles sur un document ou une personne.', s: ['La nature du document (texte, photo, carte…).', 'L’auteur, la date, la source.', 'Le sujet principal.'], x: 'Présente le document 1. → C’est une photographie prise en 1945 qui montre…', p: 'N’oublie pas la nature, l’auteur et la date.' },
+  { v: 'Proposer', f: ['propose', 'proposez', 'proposer'], c: 'expliquer', a: 'Donner une idée ou une hypothèse personnelle.', s: ['Pars de ce que tu sais.', 'Écris ton idée : « Je propose… », « Je pense que… ».'], x: 'Propose une hypothèse. → Je pense que la plante a besoin de lumière.', p: 'Il n’y a pas forcément une seule bonne réponse.' },
+  { v: 'Commenter', f: ['commente', 'commentez', 'commenter'], c: 'expliquer', a: 'Expliquer un document en donnant son sens et son intérêt.', s: ['Présente le document.', 'Explique les idées importantes.', 'Dis ce que le document montre ou apprend.'], x: 'Commente ce graphique.', p: 'Commenter, ce n’est pas seulement décrire.' },
+  { v: 'Calculer', f: ['calcule', 'calculez', 'calculer'], c: 'calculer', a: 'Trouver un résultat avec des opérations.', s: ['Écris l’opération.', 'Pose-la si besoin (lame Opérations).', 'Écris le résultat avec son unité.'], x: 'Calcule le prix de 3 cahiers à 2 €. → 3 × 2 = 6 €', p: 'N’oublie pas l’unité (€, cm, kg…).' },
+  { v: 'Démontrer', f: ['démontre', 'démontrez', 'démontrer', 'prouve', 'prouvez', 'prouver'], c: 'calculer', a: 'Prouver qu’une chose est vraie, étape par étape, avec des propriétés.', s: ['Écris ce que tu sais (les données).', 'Cite la propriété ou le théorème utilisé.', 'Écris la conclusion : « donc… ».'], x: 'Démontre que ABC est rectangle. → On sait que… Or… Donc…', p: 'Chaque étape doit s’appuyer sur une donnée ou une propriété.' },
+  { v: 'Vérifier', f: ['vérifie', 'vérifiez', 'vérifier'], c: 'calculer', a: 'Contrôler si une réponse ou une affirmation est juste.', s: ['Refais le calcul ou relis la règle.', 'Compare avec la réponse proposée.', 'Conclus : « c’est juste » ou « c’est faux car… ».'], x: 'Vérifie que 12 est solution. → 3 × 12 − 6 = 30, donc oui.', p: 'Montre ton calcul de vérification.' },
+  { v: 'Tracer', f: ['trace', 'tracez', 'tracer', 'construis', 'construisez', 'construire'], c: 'calculer', a: 'Faire une figure précise avec les instruments.', s: ['Prépare règle, équerre, compas et un crayon bien taillé.', 'Fais d’abord un schéma à main levée.', 'Trace étape par étape, puis code la figure.'], x: 'Trace un triangle de côtés 5 cm, 4 cm et 3 cm.', p: 'Ne gomme pas les traits de construction.' },
+  { v: 'Schématiser', f: ['schématise', 'schématisez', 'schématiser'], c: 'trier', a: 'Représenter une idée avec un dessin simple, des flèches et des légendes.', s: ['Choisis les éléments importants.', 'Dessine des formes simples.', 'Relie avec des flèches et écris les légendes.'], x: 'Schématise le trajet du sang.', p: 'Un schéma n’est pas un beau dessin : il doit être clair et légendé.' },
+  { v: 'Classer', f: ['classe', 'classez', 'classer', 'range', 'rangez', 'ranger', 'trie', 'triez', 'trier'], c: 'trier', a: 'Ranger des éléments dans des groupes ou dans un ordre.', s: ['Lis le critère de classement.', 'Fais un tableau avec une colonne par groupe.', 'Range chaque élément, puis vérifie.'], x: 'Classe ces animaux : vertébrés / invertébrés.', p: 'Chaque élément ne va que dans un seul groupe.' },
+  { v: 'Relier', f: ['relie', 'reliez', 'relier', 'associe', 'associez', 'associer'], c: 'trier', a: 'Mettre ensemble les éléments qui vont ensemble.', s: ['Commence par les paires dont tu es sûr·e.', 'Relie à la règle.', 'Termine par élimination.'], x: 'Relie chaque mot à sa définition.', p: 'Vérifie qu’il ne reste pas d’élément sans paire.' },
+  { v: 'Légender', f: ['légende', 'légendez', 'légender'], c: 'trier', a: 'Écrire le nom des éléments d’un schéma, d’une carte ou d’une image.', s: ['Repère chaque élément à nommer.', 'Trace un trait à la règle vers l’élément.', 'Écris le nom au bout du trait, bien à l’horizontale.'], x: 'Légende le schéma de la fleur.', p: 'Les traits ne doivent pas se croiser.' }
+];
+var FORMES = {}, AMBIGUS = { classe: 1, trace: 1, legende: 1, range: 1, presente: 1, copie: 1, observe: 0 };
+VERBES.forEach(function (vb) { vb.f.forEach(function (f) { FORMES[sansAccent(f)] = vb; }); });
+function analyserConsigne(txt) {
+  var re = /[A-Za-zÀ-ÖØ-öø-ÿŒœ]+/g, m, out = [], vus = {};
+  while ((m = re.exec(txt)) !== null) {
+    var n = sansAccent(m[0]), vb = FORMES[n];
+    if (!vb) continue;
+    if (AMBIGUS[n]) {
+      var avant = txt.slice(0, m.index).replace(/\s+$/, ''), dc = avant.charAt(avant.length - 1);
+      if (avant.length && '.:;!?-–•)\n0123456789'.indexOf(dc) < 0) continue;
+    }
+    out.push({ vb: vb, s: m.index, e: m.index + m[0].length });
+  }
+  var uniq = out.filter(function (o) { if (vus[o.vb.v]) return false; vus[o.vb.v] = 1; return true; });
+  return { tous: out, actions: uniq };
+}
+function indicesConsigne(txt) {
+  var t = sansAccent(txt), l = [], mm;
+  mm = t.match(/\b(deux|trois|quatre|cinq|six|sept|huit|dix)\b/);
+  if (mm) l.push('On te demande un nombre précis : « ' + mm[1] + ' ». Compte tes éléments quand tu as fini.');
+  if (/\bligne|\bl\.\s?\d/.test(t)) l.push('Pense à donner les numéros de lignes, par exemple (l. 12).');
+  if (/phrase/.test(t)) l.push('Réponds par une phrase complète : une majuscule au début et un point à la fin.');
+  if (/\bdoc(ument)?s?\b/.test(t)) l.push('Dis de quel document tu parles (doc. 1, doc. 2…).');
+  if (/en anglais/.test(t)) l.push('La réponse est attendue en anglais.');
+  if (/en francais/.test(t)) l.push('La réponse est attendue en français.');
+  if (/(ton avis|selon toi|selon vous|votre avis|personnel)/.test(t)) l.push('On attend ton avis : commence par « Je pense que… » et donne une raison.');
+  if (/exemple/.test(t)) l.push('Il faut au moins un exemple précis.');
+  if (/(tes propres mots|vos propres mots|avec tes mots|avec vos mots)/.test(t)) l.push('Avec TES mots : ne recopie pas le texte.');
+  if (/\bunite/.test(t)) l.push('N’oublie pas l’unité (cm, kg, €…).');
+  return l;
+}
+function carteVerbe(vb, num) {
+  var cat = CATS[vb.c];
+  return h('div', { 'class': 'action', style: '--cat:' + cat.c },
+    h('div', null, num ? h('div', { 'class': 'num' }, String(num)) : h('div', { 'class': 'num' }, ico(cat.ic))),
+    h('div', null,
+      h('div', { 'class': 'cat-tag' }, ico(cat.ic), cat.nom),
+      h('div', { 'class': 'verbe' }, vb.v),
+      h('div', { 'class': 'att' }, vb.a),
+      h('ol', { 'class': 'faire' }, vb.s.map(function (s) { return h('li', null, s); })),
+      h('div', { 'class': 'exemple' }, h('b', null, 'Exemple : '), vb.x),
+      h('div', { 'class': 'piege' }, 'Attention : ' + vb.p)));
+}
+function rConsignes(sh) {
+  var ta = h('textarea', { 'class': 'lisible', rows: '4', placeholder: 'Colle ou écris la consigne ici…', value: S.consigne, 'aria-label': 'Consigne', oninput: function () { S.consigne = ta.value; sauver(); } });
+  var res = h('div');
+  function decoder() {
+    vider(res);
+    var txt = ta.value.trim(); if (!txt) { ta.focus(); return; }
+    var an = analyserConsigne(txt), ind = indicesConsigne(txt);
+    var z = h('div', { 'class': 'zone lisible', style: 'margin-top:16px' }), dernier = 0;
+    an.tous.forEach(function (o) {
+      z.appendChild(document.createTextNode(txt.slice(dernier, o.s)));
+      z.appendChild(h('mark', { 'class': 'v', style: '--cat:' + CATS[o.vb.c].c }, txt.slice(o.s, o.e)));
+      dernier = o.e;
+    });
+    z.appendChild(document.createTextNode(txt.slice(dernier)));
+    res.appendChild(z);
+    if (!an.actions.length) {
+      res.appendChild(h('div', { 'class': 'vide', style: 'margin-top:14px' }, 'Je n’ai pas trouvé de verbe de consigne connu. Cherche le verbe qui dit quoi faire (relève, explique, calcule…), ou regarde la liste en bas de la page.'));
+    } else {
+      res.appendChild(h('div', { 'class': 'titre' }, an.actions.length === 1 ? 'Une seule action à faire' : 'Ta consigne contient ' + an.actions.length + ' actions, dans cet ordre'));
+      an.actions.forEach(function (o, i) { res.appendChild(carteVerbe(o.vb, an.actions.length > 1 ? i + 1 : 0)); });
+    }
+    if (ind.length) {
+      res.appendChild(h('div', { 'class': 'titre' }, 'Les petits détails qui comptent'));
+      res.appendChild(h('ul', { 'class': 'indices' }, ind.map(function (x) { return h('li', null, x); })));
+    }
+    if (an.actions.length) {
+      res.appendChild(h('div', { 'class': 'rang', style: 'margin-top:16px' }, btn('En faire des étapes', 'etapes', function () {
+        var steps = [{ t: 'Lire la consigne en entier, deux fois', f: false }];
+        an.actions.forEach(function (o) { steps.push({ t: o.vb.v + ' : ' + o.vb.a.charAt(0).toLowerCase() + o.vb.a.slice(1), f: false }); });
+        steps.push({ t: 'Relire ma réponse et vérifier les petits détails', f: false });
+        var tache = { id: uid(), titre: txt.length > 60 ? txt.slice(0, 57) + '…' : txt, steps: steps, i: 0 };
+        S.etapes.list.unshift(tache); S.etapes.active = tache.id; sauver(); aller('etapes');
+      }, 'prim')));
+    }
+  }
+  var liste = h('div');
+  Object.keys(CATS).forEach(function (k) {
+    var cat = CATS[k], d = h('details', { 'class': 'cat-bloc', style: '--cat:' + cat.c }, h('summary', null, cat.nom));
+    var zone = h('div'), puces = h('div', { 'class': 'rang' });
+    VERBES.filter(function (vb) { return vb.c === k; }).forEach(function (vb) {
+      puces.appendChild(h('button', { 'class': 'puce', type: 'button', onclick: function () { vider(zone); zone.appendChild(carteVerbe(vb, 0)); } }, vb.v));
+    });
+    d.appendChild(puces); d.appendChild(zone); liste.appendChild(d);
+  });
+  ajoute(sh, [
+    h('div', { 'class': 'titre' }, 'Ta consigne'),
+    h('p', { 'class': 'aide' }, 'Colle la consigne : je repère ce qu’on te demande de faire et je t’explique comment t’y prendre.'),
+    ta,
+    h('div', { 'class': 'rang' },
+      btn('Décoder', 'consignes', decoder, 'prim gros'),
+      btn('Écouter', 'lecteur', function () { if (ta.value.trim()) TTS.dire(ta.value, 'fr'); }),
+      btn('Exemple', null, function () { ta.value = 'Relevez deux indices qui montrent que le personnage a peur, puis expliquez pourquoi il refuse d’entrer. Justifiez votre réponse avec le texte.'; S.consigne = ta.value; sauver(); decoder(); })),
+    res,
+    h('div', { 'class': 'titre', style: 'margin-top:30px' }, 'Tous les verbes de consigne'),
+    h('p', { 'class': 'aide' }, 'Ouvre une famille, puis touche un verbe pour voir ce qu’il veut dire.'),
+    liste
+  ]);
+  if (S.consigne.trim()) decoder();
+}
+
+/* =========================================================
+   LAME 4 — Étapes
+   ========================================================= */
+var MODELES = [
+  { t: 'Rédiger un texte', s: ['Lire la consigne et souligner les mots importants', 'Noter 3 idées au brouillon', 'Mettre les idées dans l’ordre', 'Écrire le début', 'Écrire la suite', 'Écrire la fin', 'Relire : majuscules et points', 'Relire : accords et orthographe'] },
+  { t: 'Apprendre une leçon', s: ['Lire la leçon une fois en entier', 'Surligner les 3 idées principales', 'Cacher la leçon et redire avec mes mots', 'Faire une carte mentale ou un schéma', 'Me poser 3 questions et y répondre', 'Vérifier avec la leçon'] },
+  { t: 'Exercice de maths', s: ['Lire l’énoncé deux fois', 'Souligner les données (les nombres)', 'Écrire ce que je cherche', 'Choisir l’opération ou la méthode', 'Calculer', 'Vérifier que le résultat est logique', 'Écrire une phrase réponse avec l’unité'] },
+  { t: 'Préparer un oral', s: ['Choisir mon sujet', 'Noter 3 idées sur des petites fiches', 'Trouver un exemple pour chaque idée', 'Répéter une fois à voix haute', 'Répéter en me chronométrant', 'Répéter devant quelqu’un'] },
+  { t: 'Ranger mon bureau / mon sac', s: ['Tout sortir', 'Jeter ce qui ne sert plus', 'Ranger les cahiers par matière', 'Vérifier la trousse', 'Remettre seulement ce dont j’ai besoin demain'] }
+];
+function rEtapes(sh) {
+  var E = S.etapes, vue = 'liste', courante = null;
+  courante = trouve(E.list, function (t) { return t.id === E.active; });
+  if (courante) vue = courante.i >= courante.steps.length ? 'fini' : 'focus';
+  function dessiner() { vider(sh); TTS.stop(); if (vue === 'liste') liste(); else if (vue === 'edit') edition(); else if (vue === 'fini') fini(); else focus(); }
+  function nouvelle(titre, steps) {
+    var t = { id: uid(), titre: titre || 'Ma tâche', steps: (steps || []).map(function (x) { return { t: x, f: false }; }), i: 0 };
+    E.list.unshift(t); E.active = t.id; courante = t; sauver(); vue = 'edit'; dessiner();
+  }
+  function liste() {
+    E.active = ''; sauver();
+    sh.appendChild(h('div', { 'class': 'titre' }, 'Mes tâches'));
+    if (!E.list.length) sh.appendChild(h('div', { 'class': 'vide' }, 'Pas encore de tâche. Crée-en une ci-dessous : on la découpe en petites étapes, et tu n’en vois qu’une à la fois.'));
+    E.list.forEach(function (t) {
+      var faites = t.steps.filter(function (s) { return s.f; }).length;
+      sh.appendChild(h('div', { 'class': 'carte-item' },
+        h('div', { style: 'font-weight:600;font-size:18px' }, t.titre),
+        h('div', { 'class': 'aide', style: 'margin:4px 0 8px' }, faites + ' étape' + (faites > 1 ? 's' : '') + ' faite' + (faites > 1 ? 's' : '') + ' sur ' + t.steps.length),
+        h('div', { 'class': 'rang', style: 'margin:0' },
+          btn(faites ? 'Reprendre' : 'Commencer', 'lire', function () { courante = t; E.active = t.id; sauver(); vue = t.steps.length ? (t.i >= t.steps.length ? 'fini' : 'focus') : 'edit'; dessiner(); }, 'prim petit'),
+          btn('Modifier', 'crayon', function () { courante = t; E.active = t.id; sauver(); vue = 'edit'; dessiner(); }, 'petit'),
+          btn('Supprimer', 'poubelle', function () { E.list.splice(E.list.indexOf(t), 1); sauver(); dessiner(); }, 'petit'))));
+    });
+    var titre = h('input', { type: 'text', placeholder: 'Nom de la tâche (ex. : rédaction de français)', 'aria-label': 'Nom de la nouvelle tâche' });
+    sh.appendChild(h('div', { 'class': 'titre', style: 'margin-top:26px' }, 'Nouvelle tâche'));
+    sh.appendChild(titre);
+    sh.appendChild(h('div', { 'class': 'rang' }, btn('Créer une tâche vide', 'plus', function () { nouvelle(titre.value.trim(), []); }, 'prim')));
+    sh.appendChild(h('p', { 'class': 'aide' }, 'Ou pars d’un modèle (tu pourras tout modifier) :'));
+    var r = h('div', { 'class': 'rang' });
+    MODELES.forEach(function (m) { r.appendChild(h('button', { 'class': 'puce', type: 'button', onclick: function () { nouvelle(titre.value.trim() || m.t, m.s); } }, m.t)); });
+    sh.appendChild(r);
+  }
+  function edition() {
+    var t = courante;
+    var titre = h('input', { type: 'text', value: t.titre, 'aria-label': 'Nom de la tâche', oninput: function () { t.titre = titre.value; sauver(); } });
+    var zone = h('div');
+    function lignes() {
+      vider(zone);
+      if (!t.steps.length) zone.appendChild(h('div', { 'class': 'vide' }, 'Ajoute ta première étape. Une étape = une petite action que tu peux faire en quelques minutes.'));
+      t.steps.forEach(function (s, i) {
+        var inp = h('input', { type: 'text', value: s.t, 'aria-label': 'Étape ' + (i + 1), oninput: function () { s.t = inp.value; sauver(); } });
+        zone.appendChild(h('div', { 'class': 'ligne-etape' },
+          h('span', { 'class': 'n' }, String(i + 1)), inp,
+          h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Monter', disabled: i === 0, onclick: function () { t.steps.splice(i - 1, 0, t.steps.splice(i, 1)[0]); sauver(); lignes(); } }, ico('haut')),
+          h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Descendre', disabled: i === t.steps.length - 1, onclick: function () { t.steps.splice(i + 1, 0, t.steps.splice(i, 1)[0]); sauver(); lignes(); } }, ico('bas')),
+          h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Supprimer l’étape', onclick: function () { t.steps.splice(i, 1); if (t.i > t.steps.length) t.i = t.steps.length; sauver(); lignes(); } }, ico('poubelle'))));
+      });
+    }
+    var nv = h('input', { type: 'text', placeholder: 'Nouvelle étape…', 'aria-label': 'Nouvelle étape', onkeydown: function (e) { if (e.keyCode === 13) ajouter(); } });
+    function ajouter() { if (!nv.value.trim()) return; t.steps.push({ t: nv.value.trim(), f: false }); nv.value = ''; sauver(); lignes(); nv.focus(); }
+    ajoute(sh, [
+      h('div', { 'class': 'titre' }, 'Nom de la tâche'), titre,
+      h('div', { 'class': 'titre' }, 'Les étapes'), zone,
+      h('div', { 'class': 'ligne-etape', style: 'margin-top:12px' }, h('span', { 'class': 'n' }, '+'), nv, btn('Ajouter', 'plus', ajouter, 'petit')),
+      h('div', { 'class': 'rang', style: 'margin-top:20px' },
+        btn('C’est parti', 'lire', function () { if (!t.steps.length) { toast('Ajoute au moins une étape.'); return; } t.i = Math.min(t.i, t.steps.length - 1); sauver(); vue = 'focus'; dessiner(); }, 'prim gros'),
+        btn('Mes tâches', null, function () { vue = 'liste'; dessiner(); }))
+    ]);
+    lignes();
+  }
+  function crans(t) {
+    var c = h('div', { 'class': 'crans', 'aria-hidden': 'true' });
+    t.steps.forEach(function (s, i) { c.appendChild(h('span', { 'class': 'cran' + (s.f ? ' fait' : '') + (i === t.i ? ' cur' : '') })); });
+    return c;
+  }
+  function focus() {
+    var t = courante, s = t.steps[t.i];
+    ajoute(sh, h('div', { 'class': 'focus' },
+      h('div', { 'class': 'compteur' }, 'Étape ' + (t.i + 1) + ' sur ' + t.steps.length),
+      h('div', { 'class': 'aide', style: 'margin:4px 0 0' }, t.titre),
+      crans(t),
+      h('div', { 'class': 'etape-txt lisible', 'aria-live': 'polite' }, s.t),
+      h('div', { 'class': 'rang', style: 'justify-content:center' },
+        btn('C’est fait', 'coche', function () {
+          s.f = true; sonner('etape');
+          var k = indexDe(t.steps, function (x) { return !x.f; });
+          t.i = k < 0 ? t.steps.length : k; sauver();
+          vue = k < 0 ? 'fini' : 'focus'; dessiner();
+        }, 'prim gros')),
+      h('div', { 'class': 'rang', style: 'justify-content:center;margin-top:18px' },
+        btn('Écouter', 'lecteur', function () { TTS.dire(s.t, 'fr'); }, 'petit'),
+        btn('Sablier 10 min', 'sablier', function () { Chrono.regler(10); Chrono.demarrer(); toast('Sablier lancé : 10 minutes.'); }, 'petit'),
+        btn('Étape précédente', 'retour', function () { if (t.i > 0) { t.i--; t.steps[t.i].f = false; sauver(); dessiner(); } }, 'petit', { disabled: t.i === 0 }),
+        btn('Modifier', 'crayon', function () { vue = 'edit'; dessiner(); }, 'petit'),
+        btn('Mes tâches', null, function () { vue = 'liste'; dessiner(); }, 'petit'))));
+  }
+  function fini() {
+    var t = courante;
+    ajoute(sh, h('div', { 'class': 'focus' },
+      h('div', { 'class': 'compteur' }, 'Tâche terminée'),
+      crans(t),
+      h('div', { 'class': 'etape-txt lisible' }, 'Toutes les étapes sont faites. Bien joué !'),
+      h('div', { 'class': 'rang', style: 'justify-content:center' },
+        btn('Ranger la tâche', 'coche', function () { E.list.splice(E.list.indexOf(t), 1); E.active = ''; sauver(); vue = 'liste'; dessiner(); }, 'prim gros'),
+        btn('Recommencer', 'reprendre', function () { t.steps.forEach(function (x) { x.f = false; }); t.i = 0; sauver(); vue = 'focus'; dessiner(); }),
+        btn('Mes tâches', null, function () { vue = 'liste'; dessiner(); }))));
+  }
+  dessiner();
+}
+
+/* =========================================================
+   LAME 5 — Sablier (continue même quand on change de lame)
+   ========================================================= */
+var Chrono = {
+  dureeMs: S.sablier.min * 60000, resteMs: S.sablier.min * 60000, marche: false, fin: 0, phase: 'travail', iv: null, vue: null, sonne: false,
+  regler: function (min) {
+    if (this.marche) this.pause();
+    min = Math.max(1, Math.min(60, Math.round(min)));
+    if (S.sablier.cycle) { if (this.phase === 'travail') S.sablier.travail = min; else S.sablier.repos = min; }
+    else S.sablier.min = min;
+    sauver(); this.dureeMs = this.resteMs = min * 60000; this.sonne = false; this.maj();
+  },
+  demarrer: function () {
+    var self = this; audioPret();
+    if (this.resteMs <= 0) this.resteMs = this.dureeMs;
+    this.fin = Date.now() + this.resteMs; this.marche = true; this.sonne = false;
+    clearInterval(this.iv); this.iv = setInterval(function () { self.tic(); }, 250); this.maj();
+  },
+  pause: function () { if (!this.marche) return; this.resteMs = Math.max(0, this.fin - Date.now()); this.marche = false; clearInterval(this.iv); this.maj(); },
+  reinit: function () {
+    this.pause(); this.phase = 'travail';
+    var m = S.sablier.cycle ? S.sablier.travail : S.sablier.min;
+    this.dureeMs = this.resteMs = m * 60000; this.sonne = false; this.maj();
+  },
+  tic: function () { this.resteMs = Math.max(0, this.fin - Date.now()); if (this.resteMs <= 0) this.terminer(); this.maj(); },
+  terminer: function () {
+    clearInterval(this.iv); this.marche = false; this.resteMs = 0; sonner('fin');
+    if (S.sablier.cycle) {
+      this.phase = this.phase === 'travail' ? 'repos' : 'travail';
+      var m = this.phase === 'travail' ? S.sablier.travail : S.sablier.repos;
+      this.dureeMs = this.resteMs = m * 60000;
+      toast(this.phase === 'repos' ? 'C’est l’heure de la pause.' : 'On reprend le travail.');
+      this.demarrer();
+    } else { this.sonne = true; toast('Temps écoulé !'); }
+  },
+  actif: function () { return this.marche || (this.resteMs > 0 && this.resteMs < this.dureeMs); },
+  maj: function () { majPuceChrono(); if (this.vue) this.vue(); }
+};
+function mmss(ms) { var s = Math.ceil(ms / 1000), m = Math.floor(s / 60); return pad2(m) + ':' + pad2(s % 60); }
+function majPuceChrono() {
+  if (!puceChrono) return;
+  var a = Chrono.actif() && outilCourant !== 'sablier';
+  puceChrono.hidden = !a;
+  if (a) puceChrono.textContent = (Chrono.marche ? '' : '❚❚ ') + mmss(Chrono.resteMs);
+}
+function cadranSVG() {
+  var s = '<svg class="cadran" viewBox="-110 -110 220 220" role="img" aria-label="Cadran du sablier">';
+  s += '<circle r="104" fill="#2A2F35"/><circle r="99" fill="#FFFDF8"/>';
+  for (var i = 0; i < 60; i++) {
+    var a = i * Math.PI / 30, gros = i % 5 === 0, r1 = gros ? 86 : 91;
+    s += '<line x1="' + (Math.sin(a) * r1).toFixed(2) + '" y1="' + (-Math.cos(a) * r1).toFixed(2) + '" x2="' + (Math.sin(a) * 97).toFixed(2) + '" y2="' + (-Math.cos(a) * 97).toFixed(2) + '" stroke="#2A2F35" stroke-width="' + (gros ? 2.4 : 1) + '"/>';
+    if (gros) s += '<text x="' + (Math.sin(a) * 75).toFixed(2) + '" y="' + (-Math.cos(a) * 75 + 4.5).toFixed(2) + '" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="13" fill="#2A2F35">' + i + '</text>';
+  }
+  s += '<path id="secteur" d="" fill="var(--h)"/>';
+  s += '<circle r="9" fill="#C9CED2" stroke="#6C7278" stroke-width="2"/></svg>';
+  return s;
+}
+function secteur(angle) {
+  var r = 64;
+  if (angle <= 0.05) return '';
+  if (angle >= 359.95) return 'M0,-' + r + ' A' + r + ',' + r + ' 0 1,1 0,' + r + ' A' + r + ',' + r + ' 0 1,1 0,-' + r + ' Z';
+  var a = angle * Math.PI / 180, x = Math.sin(a) * r, y = -Math.cos(a) * r;
+  return 'M0,0 L0,-' + r + ' A' + r + ',' + r + ' 0 ' + (angle > 180 ? 1 : 0) + ',1 ' + x.toFixed(2) + ',' + y.toFixed(2) + ' Z';
+}
+function rSablier(sh) {
+  var st = S.sablier;
+  var w = h('div', { 'class': 'cadran-w', html: cadranSVG() });
+  var svg = w.querySelector('svg'), path = svg.querySelector('#secteur');
+  var temps = h('div', { 'class': 'temps', 'aria-live': 'off' }), phase = h('div', { 'class': 'phase' });
+  var bGo = h('button', { 'class': 'btn prim gros', type: 'button', onclick: function () { if (Chrono.marche) Chrono.pause(); else Chrono.demarrer(); } });
+  var boite = h('div');
+  function vue() {
+    path.setAttribute('d', secteur(Chrono.resteMs / 3600000 * 360));
+    path.setAttribute('fill', Chrono.phase === 'repos' ? '#2F855A' : 'var(--h)');
+    temps.textContent = mmss(Chrono.resteMs); temps.hidden = !st.chiffres;
+    phase.textContent = st.cycle ? (Chrono.phase === 'repos' ? 'Pause' : 'Travail') : (Chrono.sonne ? 'Temps écoulé' : '');
+    vider(bGo); ajoute(bGo, Chrono.marche ? [ico('pausebtn'), 'Pause'] : [ico('lire'), Chrono.resteMs < Chrono.dureeMs && Chrono.resteMs > 0 ? 'Reprendre' : 'Démarrer']);
+    boite.className = Chrono.sonne ? 'fini' : '';
+  }
+  Chrono.vue = vue;
+  var glisse = false;
+  function depuisPointeur(e) {
+    var r = svg.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    var a = Math.atan2(dx, -dy); if (a < 0) a += 2 * Math.PI;
+    var m = Math.round(a / (2 * Math.PI) * 60); if (m === 0) m = dx < 0 ? 60 : 1;
+    Chrono.regler(m);
+  }
+  svg.addEventListener('pointerdown', function (e) { if (Chrono.marche) return; glisse = true; if (svg.setPointerCapture) svg.setPointerCapture(e.pointerId); depuisPointeur(e); });
+  svg.addEventListener('pointermove', function (e) { if (glisse) depuisPointeur(e); });
+  svg.addEventListener('pointerup', function () { glisse = false; });
+  svg.addEventListener('pointercancel', function () { glisse = false; });
+  var presets = h('div', { 'class': 'rang', style: 'justify-content:center' });
+  [2, 5, 10, 15, 20, 30, 45].forEach(function (m) { presets.appendChild(h('button', { 'class': 'puce', type: 'button', onclick: function () { Chrono.regler(m); } }, m + ' min')); });
+  var cyc = h('div', { hidden: !st.cycle });
+  function selMin(label, cle, vals) {
+    var sel = h('select', { 'aria-label': label, onchange: function () { st[cle] = parseInt(sel.value, 10); sauver(); if (!Chrono.marche) Chrono.reinit(); } });
+    vals.forEach(function (v) { var o = h('option', { value: String(v) }, v + ' min'); if (v === st[cle]) o.selected = true; sel.appendChild(o); });
+    return h('div', null, h('label', { 'class': 'lab' }, label), sel);
+  }
+  cyc.appendChild(h('div', { 'class': 'grille2' }, selMin('Temps de travail', 'travail', [5, 10, 15, 20, 25, 30]), selMin('Temps de pause', 'repos', [2, 3, 5, 10])));
+  ajoute(boite, [w, temps, phase]);
+  ajoute(sh, [
+    boite,
+    h('div', { 'class': 'rang', style: 'justify-content:center' }, bGo,
+      btn('Remettre à zéro', 'reprendre', function () { Chrono.reinit(); }),
+      h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Une minute de moins', onclick: function () { Chrono.regler(Math.ceil(Chrono.resteMs / 60000) - 1); } }, '−1'),
+      h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Une minute de plus', onclick: function () { Chrono.regler(Math.ceil(Chrono.resteMs / 60000) + 1); } }, '+1')),
+    h('p', { 'class': 'aide', style: 'text-align:center' }, 'Tourne le cadran avec ton doigt, ou choisis une durée.'),
+    presets,
+    bascule('Afficher les minutes en chiffres', st.chiffres, function (on) { st.chiffres = on; sauver(); vue(); }),
+    bascule('Mode travail / pause en boucle', st.cycle, function (on) { st.cycle = on; sauver(); cyc.hidden = !on; Chrono.reinit(); }),
+    cyc,
+    bascule('Petit son à la fin', S.sons, function (on) { S.sons = on; sauver(); }),
+    h('p', { 'class': 'note' }, 'Le sablier continue de tourner si tu ouvres une autre lame : il reste visible en haut de l’écran.')
+  ]);
+  vue();
+}
+
+/* =========================================================
+   LAME 6 — Mon sac
+   ========================================================= */
+var COUL_MAT = ['#C0392B', '#2E6DB4', '#2F855A', '#B7791F', '#7B4F2C', '#6B46C1', '#D9641E', '#2C7A7B', '#B83280', '#4A5568'];
+var JOURS_ECOLE = [['1', 'Lun'], ['2', 'Mar'], ['3', 'Mer'], ['4', 'Jeu'], ['5', 'Ven']];
+function jourEcoleSuivant() {
+  var d = plusJours(aujourdhui(), 1);
+  while (d.getDay() === 0 || d.getDay() === 6) d = plusJours(d, 1);
+  return d;
+}
+function rSac(sh) {
+  var sac = S.sac, vide = true, k;
+  for (k in sac.edt) if (sac.edt.hasOwnProperty(k) && sac.edt[k].length) vide = false;
+  var onglet = vide ? 'edt' : 'demain', cible = jourEcoleSuivant();
+  var cont = h('div');
+  function dessiner() {
+    vider(sh);
+    sh.appendChild(onglets([['demain', 'Mon sac'], ['edt', 'Emploi du temps'], ['matieres', 'Matières']], onglet, function (o) { onglet = o; dessiner(); }));
+    vider(cont); sh.appendChild(cont);
+    if (onglet === 'demain') demain(); else if (onglet === 'edt') edt(); else matieres();
+  }
+  function mat(id) { return trouve(sac.matieres, function (m) { return m.id === id; }); }
+  function demain() {
+    var iso = isoJour(cible), jour = String(cible.getDay()), ids = (sac.edt[jour] || []).filter(function (id) { return !!mat(id); });
+    var coches = sac.coches[iso] || (sac.coches[iso] = {});
+    Object.keys(sac.coches).forEach(function (d) { if (depuisIso(d) < plusJours(aujourdhui(), -14)) delete sac.coches[d]; });
+    var jours = h('div', { 'class': 'rang' });
+    JOURS_ECOLE.forEach(function (j) {
+      var d = aujourdhui(); while (String(d.getDay()) !== j[0]) d = plusJours(d, 1);
+      if (isoJour(d) === isoJour(aujourdhui()) && new Date().getHours() >= 12) d = plusJours(d, 7);
+      jours.appendChild(h('button', { 'class': 'puce' + (String(cible.getDay()) === j[0] ? ' on' : ''), type: 'button', onclick: function () { cible = d; dessiner(); } }, j[1]));
+    });
+    cont.appendChild(h('div', { 'class': 'titre' }, 'Mon sac pour ' + libDate(cible)));
+    cont.appendChild(jours);
+    if (!ids.length) { cont.appendChild(h('div', { 'class': 'vide' }, 'Aucune matière ce jour-là dans ton emploi du temps. Remplis l’onglet « Emploi du temps ».')); }
+    else {
+      var r = h('div', { 'class': 'rang' });
+      ids.forEach(function (id) { var m = mat(id); r.appendChild(h('span', { 'class': 'puce' }, h('span', { 'class': 'pastille', style: 'background:' + m.c }), m.nom)); });
+      cont.appendChild(r);
+    }
+    var items = [], vus = {};
+    sac.toujours.forEach(function (it) { var c = it.toLowerCase(); if (!vus[c]) { vus[c] = 1; items.push({ t: it, c: '#8A8F96' }); } });
+    ids.forEach(function (id) { var m = mat(id); m.items.forEach(function (it) { var c = it.toLowerCase(); if (!vus[c]) { vus[c] = 1; items.push({ t: it, c: m.c }); } }); });
+    var compteur = h('div', { 'class': 'compteur', style: 'margin:16px 0 4px' });
+    function majC() {
+      var n = items.filter(function (it) { return coches[it.t.toLowerCase()]; }).length;
+      compteur.textContent = n === items.length && n ? 'Sac prêt !' : n + ' sur ' + items.length + ' dans le sac';
+    }
+    cont.appendChild(compteur);
+    items.forEach(function (it) {
+      var cle = it.t.toLowerCase();
+      var b = h('button', { 'class': 'ligne-coche' + (coches[cle] ? ' fait' : ''), type: 'button', 'aria-pressed': coches[cle] ? 'true' : 'false', onclick: function () {
+        coches[cle] = !coches[cle]; sauver();
+        b.className = 'ligne-coche' + (coches[cle] ? ' fait' : ''); b.setAttribute('aria-pressed', coches[cle] ? 'true' : 'false');
+        majC(); if (coches[cle]) { var tous = items.every(function (x) { return coches[x.t.toLowerCase()]; }); if (tous) sonner('juste'); }
+      } }, h('span', { 'class': 'case' }, ico('coche')), h('span', { 'class': 'pastille', style: 'background:' + it.c }), h('span', { 'class': 'txt' }, it.t));
+      cont.appendChild(b);
+    });
+    majC();
+    cont.appendChild(h('div', { 'class': 'rang', style: 'margin-top:14px' }, btn('Tout décocher', 'reprendre', function () { sac.coches[iso] = {}; sauver(); dessiner(); }, 'petit')));
+  }
+  function edt() {
+    cont.appendChild(h('p', { 'class': 'aide' }, 'Pour chaque jour, touche les matières que tu as. Il suffit de le faire une fois.'));
+    JOURS_ECOLE.forEach(function (j) {
+      var r = h('div', { 'class': 'rang' }), liste = sac.edt[j[0]] || (sac.edt[j[0]] = []);
+      sac.matieres.forEach(function (m) {
+        var on = liste.indexOf(m.id) >= 0;
+        var b = h('button', { 'class': 'puce' + (on ? ' on' : ''), type: 'button', 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+          var k2 = liste.indexOf(m.id); if (k2 < 0) liste.push(m.id); else liste.splice(k2, 1); sauver();
+          b.className = 'puce' + (k2 < 0 ? ' on' : ''); b.setAttribute('aria-pressed', k2 < 0 ? 'true' : 'false');
+        } }, h('span', { 'class': 'pastille', style: 'background:' + m.c }), m.nom);
+        r.appendChild(b);
+      });
+      cont.appendChild(h('div', { 'class': 'carte-item' }, h('div', { style: 'font-weight:700;font-size:18px;text-transform:capitalize' }, JOURS[+j[0]]), r));
+    });
+  }
+  function editeurListe(liste, placeholder) {
+    var z = h('div');
+    function rendre() {
+      vider(z);
+      var r = h('div', { 'class': 'rang' });
+      liste.forEach(function (it, i) { r.appendChild(h('span', { 'class': 'puce' }, it, h('button', { 'class': 'mini', type: 'button', style: 'width:30px;height:30px;border:none', 'aria-label': 'Retirer ' + it, onclick: function () { liste.splice(i, 1); sauver(); rendre(); } }, ico('croix')))); });
+      var inp = h('input', { type: 'text', placeholder: placeholder, 'aria-label': placeholder, onkeydown: function (e) { if (e.keyCode === 13) plus(); } });
+      function plus() { if (inp.value.trim()) { liste.push(inp.value.trim()); sauver(); rendre(); z.querySelector('input').focus(); } }
+      z.appendChild(r);
+      z.appendChild(h('div', { 'class': 'ligne-etape' }, inp, btn('Ajouter', 'plus', plus, 'petit')));
+    }
+    rendre(); return z;
+  }
+  function matieres() {
+    cont.appendChild(h('div', { 'class': 'carte-item' }, h('div', { style: 'font-weight:700;font-size:18px' }, 'Toujours dans le sac'), editeurListe(sac.toujours, 'Ajouter une affaire…')));
+    sac.matieres.forEach(function (m, i) {
+      var nom = h('input', { type: 'text', value: m.nom, 'aria-label': 'Nom de la matière', oninput: function () { m.nom = nom.value; sauver(); } });
+      var coul = h('div', { 'class': 'rang', style: 'margin:8px 0' });
+      COUL_MAT.forEach(function (c) { coul.appendChild(h('button', { type: 'button', 'class': 'mini', style: 'background:' + c + ';' + (m.c === c ? 'border-color:#1E2226;box-shadow:0 0 0 2px #1E2226' : ''), 'aria-label': 'Couleur', onclick: function () { m.c = c; sauver(); dessiner(); } })); });
+      cont.appendChild(h('div', { 'class': 'carte-item', style: 'border-left:8px solid ' + m.c },
+        h('div', { 'class': 'ligne-etape' }, nom, h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Supprimer la matière', onclick: function () {
+          sac.matieres.splice(i, 1); for (var d in sac.edt) if (sac.edt.hasOwnProperty(d)) { var k3 = sac.edt[d].indexOf(m.id); if (k3 >= 0) sac.edt[d].splice(k3, 1); } sauver(); dessiner();
+        } }, ico('poubelle'))), coul, editeurListe(m.items, 'Ajouter une affaire pour ' + m.nom + '…')));
+    });
+    cont.appendChild(h('div', { 'class': 'rang' }, btn('Ajouter une matière', 'plus', function () { sac.matieres.push({ id: uid(), nom: 'Nouvelle matière', c: COUL_MAT[sac.matieres.length % COUL_MAT.length], items: [] }); sauver(); dessiner(); }, 'prim')));
+  }
+  dessiner();
+}
+
+/* =========================================================
+   LAME 7 — Devoirs
+   ========================================================= */
+function libEcheance(iso) {
+  var d = depuisIso(iso), n = Math.round((d - aujourdhui()) / 86400000);
+  if (n < 0) return 'en retard (' + libDate(d) + ')';
+  if (n === 0) return 'pour aujourd’hui';
+  if (n === 1) return 'pour demain';
+  if (n === 2) return 'pour après-demain';
+  return 'pour ' + libDate(d);
+}
+var TAILLES = { petit: '5 min', moyen: '15 min', gros: '30 min et +' };
+function rDevoirs(sh) {
+  var vueForm = false;
+  function dessiner() { vider(sh); if (vueForm) formulaire(); else liste(); }
+  function nomMat(id) { var m = trouve(S.sac.matieres, function (x) { return x.id === id; }); return m ? m : { nom: 'Autre', c: '#8A8F96' }; }
+  function liste() {
+    sh.appendChild(h('div', { 'class': 'rang', style: 'margin-top:0' }, btn('Noter un devoir', 'plus', function () { vueForm = true; dessiner(); }, 'prim gros')));
+    var auj = isoJour(aujourdhui()), dem = isoJour(plusJours(aujourdhui(), 1)), sem = isoJour(plusJours(aujourdhui(), 7));
+    var aFaire = S.devoirs.filter(function (d) { return !d.fait; }).sort(function (a, b) { return a.pour < b.pour ? -1 : 1; });
+    var groupes = [
+      ['En retard', aFaire.filter(function (d) { return d.pour < auj; })],
+      ['Pour demain (à faire ce soir)', aFaire.filter(function (d) { return d.pour >= auj && d.pour <= dem; })],
+      ['Cette semaine', aFaire.filter(function (d) { return d.pour > dem && d.pour <= sem; })],
+      ['Plus tard', aFaire.filter(function (d) { return d.pour > sem; })]
+    ];
+    if (!aFaire.length) sh.appendChild(h('div', { 'class': 'vide', style: 'margin-top:14px' }, 'Aucun devoir à faire. Quand un prof donne un devoir, note-le ici tout de suite.'));
+    groupes.forEach(function (g) {
+      if (!g[1].length) return;
+      sh.appendChild(h('div', { 'class': 'titre' }, g[0]));
+      g[1].forEach(function (d) { sh.appendChild(ligne(d)); });
+    });
+    var faits = S.devoirs.filter(function (d) { return d.fait; });
+    if (faits.length) {
+      sh.appendChild(h('div', { 'class': 'titre' }, 'Faits'));
+      faits.forEach(function (d) { sh.appendChild(ligne(d)); });
+      sh.appendChild(h('div', { 'class': 'rang' }, btn('Effacer les devoirs faits', 'poubelle', function () { S.devoirs = S.devoirs.filter(function (d) { return !d.fait; }); sauver(); dessiner(); }, 'petit')));
+    }
+  }
+  function ligne(d) {
+    var m = nomMat(d.mat);
+    var coche = h('button', { 'class': 'ligne-coche' + (d.fait ? ' fait' : ''), type: 'button', style: 'margin:0;border:none;padding:0;background:none', 'aria-label': d.fait ? 'Marquer comme non fait' : 'Marquer comme fait', onclick: function () { d.fait = !d.fait; if (d.fait) sonner('etape'); sauver(); dessiner(); } }, h('span', { 'class': 'case' }, ico('coche')));
+    return h('div', { 'class': 'carte-item', style: 'border-left:8px solid ' + m.c + ';display:flex;gap:14px;align-items:flex-start' + (d.fait ? ';opacity:.55' : '') },
+      coche,
+      h('div', { style: 'flex:1;min-width:0' },
+        h('div', { style: 'font-size:14px;font-weight:700;color:' + m.c + ';text-transform:uppercase;letter-spacing:.04em' }, m.nom + ' · ' + libEcheance(d.pour)),
+        h('div', { 'class': 'lisible', style: 'margin:4px 0' + (d.fait ? ';text-decoration:line-through' : '') }, d.quoi),
+        h('div', { 'class': 'aide', style: 'margin:0' }, 'Taille : ' + (TAILLES[d.taille] || '')),
+        d.fait ? null : h('div', { 'class': 'rang', style: 'margin:8px 0 0' },
+          btn('Découper en étapes', 'etapes', function () {
+            var t = { id: uid(), titre: m.nom + ' : ' + d.quoi.slice(0, 50), steps: [{ t: 'Relire ce qu’il faut faire : ' + d.quoi, f: false }, { t: 'Sortir le cahier et le matériel de ' + m.nom, f: false }], i: 0 };
+            S.etapes.list.unshift(t); S.etapes.active = t.id; sauver(); aller('etapes');
+          }, 'petit'),
+          btn('Écouter', 'lecteur', function () { TTS.dire(m.nom + '. ' + d.quoi, 'fr'); }, 'petit'),
+          btn('Supprimer', 'poubelle', function () { S.devoirs.splice(S.devoirs.indexOf(d), 1); sauver(); dessiner(); }, 'petit'))));
+  }
+  function formulaire() {
+    var choixMat = S.sac.matieres.length ? S.sac.matieres[0].id : '', pour = isoJour(jourEcoleSuivant()), taille = 'moyen';
+    var mats = h('div', { 'class': 'rang' });
+    S.sac.matieres.forEach(function (m, i) {
+      var b = h('button', { 'class': 'puce' + (i === 0 ? ' on' : ''), type: 'button', onclick: function () { choixMat = m.id; var bs = mats.querySelectorAll('button'); for (var k = 0; k < bs.length; k++) bs[k].className = 'puce'; b.className = 'puce on'; } }, h('span', { 'class': 'pastille', style: 'background:' + m.c }), m.nom);
+      mats.appendChild(b);
+    });
+    var quoi = h('textarea', { 'class': 'lisible', rows: '3', placeholder: 'Exemple : exercice 4 page 52', 'aria-label': 'Le devoir' });
+    var date = h('input', { type: 'date', value: pour, 'aria-label': 'Date', onchange: function () { if (date.value) pour = date.value; majDates(); } });
+    var dates = h('div', { 'class': 'rang' });
+    var raccourcis = [['Demain', plusJours(aujourdhui(), 1)], ['Après-demain', plusJours(aujourdhui(), 2)], ['Dans une semaine', plusJours(aujourdhui(), 7)]];
+    function majDates() {
+      vider(dates);
+      raccourcis.forEach(function (r) { var iso = isoJour(r[1]); dates.appendChild(h('button', { 'class': 'puce' + (iso === pour ? ' on' : ''), type: 'button', onclick: function () { pour = iso; date.value = iso; majDates(); } }, r[0])); });
+    }
+    majDates();
+    ajoute(sh, [
+      h('div', { 'class': 'titre' }, 'Matière'), mats,
+      h('div', { 'class': 'titre' }, 'Le devoir'), quoi,
+      h('div', { 'class': 'rang' }, btn('Me le lire', 'lecteur', function () { if (quoi.value.trim()) TTS.dire(quoi.value, 'fr'); }, 'petit')),
+      h('div', { 'class': 'titre' }, 'Pour quand ?'), dates, date,
+      h('div', { 'class': 'titre' }, 'Combien de temps, à peu près ?'),
+      choix([['petit', 'Petit (5 min)'], ['moyen', 'Moyen (15 min)'], ['gros', 'Gros (30 min +)']], taille, function (t) { taille = t; }),
+      h('div', { 'class': 'rang', style: 'margin-top:22px' },
+        btn('Enregistrer', 'coche', function () {
+          if (!quoi.value.trim()) { quoi.focus(); toast('Écris le devoir.'); return; }
+          S.devoirs.push({ id: uid(), mat: choixMat, quoi: quoi.value.trim(), pour: pour, taille: taille, fait: false }); sauver(); vueForm = false; dessiner(); toast('Devoir noté.');
+        }, 'prim gros'),
+        btn('Annuler', null, function () { vueForm = false; dessiner(); }))
+    ]);
+    quoi.focus();
+  }
+  dessiner();
+}
+
+/* =========================================================
+   LAME 8 — Mots pièges
+   ========================================================= */
+function lcsMarques(juste, essai) {
+  var a = juste, b = essai, n = a.length, m = b.length, t = [], i, j;
+  for (i = 0; i <= n; i++) { t.push([]); for (j = 0; j <= m; j++) t[i].push(0); }
+  for (i = n - 1; i >= 0; i--) for (j = m - 1; j >= 0; j--) t[i][j] = a.charAt(i) === b.charAt(j) ? t[i + 1][j + 1] + 1 : Math.max(t[i + 1][j], t[i][j + 1]);
+  var okA = [], okB = []; i = 0; j = 0;
+  while (i < n && j < m) {
+    if (a.charAt(i) === b.charAt(j)) { okA[i] = 1; okB[j] = 1; i++; j++; }
+    else if (t[i + 1][j] >= t[i][j + 1]) i++; else j++;
+  }
+  return { a: okA, b: okB };
+}
+function rMots(sh) {
+  var onglet = S.mots.length ? 'liste' : 'ajouter', cont = h('div'), filtre = '', edite = null;
+  function dessiner() {
+    vider(sh);
+    sh.appendChild(onglets([['liste', 'Mes mots'], ['ajouter', edite ? 'Modifier' : 'Ajouter'], ['entrainement', 'M’entraîner']], onglet, function (o) { onglet = o; if (o !== 'ajouter') edite = null; TTS.stop(); dessiner(); }));
+    vider(cont); sh.appendChild(cont);
+    if (onglet === 'liste') liste(); else if (onglet === 'ajouter') ajouter(); else entrainement();
+  }
+  function liste() {
+    if (!S.mots.length) { cont.appendChild(h('div', { 'class': 'vide' }, 'Ton dictionnaire est vide. Ajoute les mots sur lesquels tu te trompes souvent, avec ton astuce pour t’en souvenir.')); return; }
+    var rech = h('input', { type: 'text', placeholder: 'Chercher un mot…', value: filtre, 'aria-label': 'Chercher', oninput: function () { filtre = rech.value; rendre(); } });
+    var z = h('div');
+    function rendre() {
+      vider(z);
+      var f = sansAccent(filtre.trim());
+      S.mots.slice().sort(function (a, b) { return sansAccent(a.mot) < sansAccent(b.mot) ? -1 : 1; }).forEach(function (w) {
+        if (f && sansAccent(w.mot).indexOf(f) < 0) return;
+        z.appendChild(h('div', { 'class': 'carte-item' },
+          h('div', { 'class': 'lisible', style: 'font-size:calc(var(--rs) * 1.4);font-weight:700' }, w.mot),
+          w.erreur ? h('div', { style: 'color:#8A3B12' }, 'Pas : ', h('s', null, w.erreur)) : null,
+          w.astuce ? h('div', { style: 'margin-top:6px' }, h('b', null, 'Mon astuce : '), w.astuce) : null,
+          w.ex ? h('div', { 'class': 'exemple' }, w.ex) : null,
+          h('div', { 'class': 'rang', style: 'margin:10px 0 0' },
+            btn('Écouter', 'lecteur', function () { TTS.dire(w.mot, 'fr'); }, 'petit'),
+            btn('Modifier', 'crayon', function () { edite = w; onglet = 'ajouter'; dessiner(); }, 'petit'),
+            btn('Supprimer', 'poubelle', function () { S.mots.splice(S.mots.indexOf(w), 1); sauver(); rendre(); }, 'petit'))));
+      });
+    }
+    cont.appendChild(rech); cont.appendChild(z); rendre();
+  }
+  function ajouter() {
+    var w = edite || { mot: '', erreur: '', astuce: '', ex: '' };
+    function champ(label, cle, ph) { var i = h('input', { type: 'text', value: w[cle], placeholder: ph, 'aria-label': label }); return [h('label', { 'class': 'lab' }, label), i]; }
+    var c1 = champ('Le mot bien écrit', 'mot', 'Exemple : beaucoup'), c2 = champ('Mon erreur habituelle (facultatif)', 'erreur', 'Exemple : boucoup'),
+      c3 = champ('Mon astuce pour m’en souvenir', 'astuce', 'Exemple : « beau » + « coup »'), c4 = champ('Une phrase exemple (facultatif)', 'ex', 'Exemple : J’ai beaucoup de devoirs.');
+    ajoute(cont, [c1, c2, c3, c4, h('div', { 'class': 'rang', style: 'margin-top:18px' }, btn(edite ? 'Enregistrer' : 'Ajouter le mot', 'coche', function () {
+      var mot = c1[1].value.trim(); if (!mot) { c1[1].focus(); return; }
+      w.mot = mot; w.erreur = c2[1].value.trim(); w.astuce = c3[1].value.trim(); w.ex = c4[1].value.trim();
+      if (!edite) { w.id = uid(); S.mots.push(w); }
+      sauver(); toast(edite ? 'Mot modifié.' : 'Mot ajouté.'); edite = null; onglet = 'liste'; dessiner();
+    }, 'prim gros'))]);
+    c1[1].focus();
+  }
+  function entrainement() {
+    if (!S.mots.length) { cont.appendChild(h('div', { 'class': 'vide' }, 'Ajoute d’abord quelques mots.')); return; }
+    var ordre = S.mots.slice().sort(function () { return Math.random() - 0.5; }), i = 0, justes = 0;
+    var z = h('div');
+    function question() {
+      vider(z);
+      if (i >= ordre.length) {
+        z.appendChild(h('div', { 'class': 'focus' }, h('div', { 'class': 'compteur' }, 'Série terminée'), h('div', { 'class': 'etape-txt' }, justes + ' mot' + (justes > 1 ? 's' : '') + ' juste' + (justes > 1 ? 's' : '') + ' sur ' + ordre.length),
+          h('div', { 'class': 'rang', style: 'justify-content:center' }, btn('Recommencer', 'reprendre', function () { dessiner(); }, 'prim gros'))));
+        return;
+      }
+      var w = ordre[i];
+      var inp = h('input', { type: 'text', 'class': 'lisible', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', 'aria-label': 'Écris le mot', onkeydown: function (e) { if (e.keyCode === 13) verifier(); } });
+      var retour = h('div'), indice = h('div', { hidden: true, style: 'margin-top:8px' }, w.astuce ? 'Astuce : ' + w.astuce : 'Pas d’astuce pour ce mot.');
+      var vu = h('div', { 'class': 'lisible', style: 'font-size:calc(var(--rs) * 1.6);font-weight:700;text-align:center;min-height:1.4em' });
+      function montrer() { vu.textContent = w.mot; setTimeout(function () { vu.textContent = ''; }, 3000); }
+      function verifier() {
+        var e = inp.value.trim(); if (!e) return;
+        vider(retour);
+        if (e === w.mot) { justes++; sonner('juste'); retour.appendChild(h('div', { 'class': 'alerte', style: 'background:#DDF0DB;border-color:#3E8E41' }, 'Juste !')); }
+        else {
+          var mk = lcsMarques(w.mot, e), bon = h('span', { 'class': 'lisible', style: 'font-size:calc(var(--rs) * 1.3);font-weight:700' }), mien = h('span', { 'class': 'lisible', style: 'font-size:calc(var(--rs) * 1.3)' }), k;
+          for (k = 0; k < w.mot.length; k++) bon.appendChild(mk.a[k] ? document.createTextNode(w.mot.charAt(k)) : h('span', { style: 'background:#F2B33D;border-radius:3px;padding:0 2px' }, w.mot.charAt(k)));
+          for (k = 0; k < e.length; k++) mien.appendChild(mk.b[k] ? document.createTextNode(e.charAt(k)) : h('s', { style: 'color:#B5212B' }, e.charAt(k)));
+          retour.appendChild(h('div', { 'class': 'carte-item' }, h('div', null, 'Tu as écrit : ', mien), h('div', { style: 'margin-top:6px' }, 'Le bon mot : ', bon), h('div', { 'class': 'aide', style: 'margin:6px 0 0' }, 'En jaune : les lettres qui te manquaient.')));
+        }
+        retour.appendChild(h('div', { 'class': 'rang' }, btn('Mot suivant', 'lire', function () { i++; question(); }, 'prim')));
+      }
+      ajoute(z, [
+        h('div', { 'class': 'compteur', style: 'text-align:center' }, 'Mot ' + (i + 1) + ' sur ' + ordre.length),
+        h('p', { 'class': 'aide', style: 'text-align:center' }, TTS.ok ? 'Écoute le mot, puis écris-le.' : 'Regarde le mot 3 secondes, puis écris-le.'),
+        h('div', { 'class': 'rang', style: 'justify-content:center' },
+          TTS.ok ? btn('Écouter le mot', 'lecteur', function () { TTS.dire(w.ex ? w.mot + '. ' + w.ex : w.mot, 'fr'); }, 'prim gros') : null,
+          btn('Voir 3 secondes', 'oeil', montrer, TTS.ok ? '' : 'prim gros'),
+          btn('Indice', null, function () { indice.hidden = false; })),
+        vu, indice, h('div', { style: 'margin-top:12px' }, inp),
+        h('div', { 'class': 'rang' }, btn('Vérifier', 'coche', verifier, 'prim')), retour
+      ]);
+      inp.focus();
+    }
+    cont.appendChild(z); question();
+  }
+  dessiner();
+}
+
+/* =========================================================
+   LAME 9 — Opérations posées
+   ========================================================= */
+var LAB_RANG = ['u', 'd', 'c', 'm', 'dm', 'cm', 'M', 'dM', 'cM', 'Md', 'dMd', 'cMd', 'B', 'dB', 'cB'];
+var TEINTES = ['#E3EDF9', '#FBE6E3', '#E4F2E1'];
+function rOperations(sh) {
+  var inp = h('input', { type: 'text', value: S.op, placeholder: 'Exemple : 347 + 85', 'aria-label': 'Ton calcul', autocomplete: 'off', onkeydown: function (e) { if (e.keyCode === 13) poser(); } });
+  var zoneG = h('div', { 'class': 'grille-w' }), msg = h('div'), actions = h('div', { 'class': 'rang', hidden: true });
+  var courant = null;
+  function inserer(c) { inp.value = inp.value.replace(/\s+$/, '') + ' ' + c + ' '; inp.focus(); }
+  function poser() {
+    vider(zoneG); vider(msg); actions.hidden = true; courant = null;
+    var s = inp.value.replace(/\s+/g, '').replace(/[×xX*]/g, 'x').replace(/[−–]/g, '-'), m, nums, op, res;
+    S.op = inp.value; sauver();
+    if (!s) return;
+    if (/[.,]/.test(s)) { msg.appendChild(h('div', { 'class': 'alerte' }, 'Cette lame pose les calculs avec des nombres entiers (sans virgule).')); return; }
+    if ((m = s.match(/^(\d{1,8})x(\d{1,6})$/))) { op = 'x'; nums = [m[1], m[2]]; res = String(parseInt(m[1], 10) * parseInt(m[2], 10)); }
+    else if ((m = s.match(/^(\d{1,9})-(\d{1,9})$/))) {
+      op = '-'; nums = [m[1], m[2]];
+      if (parseInt(m[1], 10) < parseInt(m[2], 10)) { msg.appendChild(h('div', { 'class': 'alerte' }, 'Pour une soustraction posée, le premier nombre doit être le plus grand.')); return; }
+      res = String(parseInt(m[1], 10) - parseInt(m[2], 10));
+    }
+    else if (/^\d{1,9}(\+\d{1,9}){1,3}$/.test(s)) { op = '+'; nums = s.split('+'); res = String(nums.reduce(function (a, b) { return a + parseInt(b, 10); }, 0)); }
+    else { msg.appendChild(h('div', { 'class': 'alerte' }, 'Je n’ai pas compris le calcul. Écris par exemple : 347 + 85, 1203 − 456 ou 37 × 24.')); return; }
+    nums = nums.map(function (x) { return String(parseInt(x, 10)); });
+    construire(op, nums, res);
+  }
+  function construire(op, nums, res) {
+    var partiels = [], n, lignes = [], grille, k;
+    if (op === 'x' && nums[1].length > 1) {
+      for (k = 0; k < nums[1].length; k++) { var dgt = parseInt(nums[1].charAt(nums[1].length - 1 - k), 10); partiels.push({ val: String(parseInt(nums[0], 10) * dgt), dec: k }); }
+    }
+    n = res.length;
+    nums.forEach(function (x) { n = Math.max(n, x.length); });
+    partiels.forEach(function (p) { n = Math.max(n, p.val.length + p.dec); });
+    grille = h('div', { 'class': 'grille', style: 'grid-template-columns:repeat(' + (n + 1) + ',auto)' });
+    function teinte(p) { return 'background:' + TEINTES[p % 3] + ';'; }
+    function caseFixe(txt, p, cls) { return h('div', { 'class': 'gc' + (cls ? ' ' + cls : ''), style: p >= 0 ? teinte(p) : '' }, txt); }
+    function rangeeEditable(type, signe) {
+      var row = [];
+      grille.appendChild(caseFixe(signe || '', -1, 'gsigne'));
+      for (var j = 0; j < n; j++) {
+        var p = n - 1 - j;
+        var c = h('input', { 'class': 'gc' + (type === 'ret' ? ' gret' : ''), type: 'text', inputmode: 'numeric', maxlength: '1', autocomplete: 'off', 'aria-label': (type === 'ret' ? 'Retenue, colonne ' : 'Chiffre, colonne ') + LAB_RANG[p], style: type === 'ret' ? '' : teinte(p) });
+        c._r = lignes.length; c._j = j; c._type = type;
+        c.addEventListener('input', surSaisie); c.addEventListener('keydown', surTouche);
+        row.push(c); grille.appendChild(c);
+      }
+      lignes.push(row); return row;
+    }
+    function surSaisie(e) {
+      var c = e.target, v = c.value.replace(/[^0-9]/g, ''); c.value = v.slice(-1);
+      c.classList.remove('ok'); c.classList.remove('ko');
+      if (c.value && c._type !== 'ret' && c._j > 0) lignes[c._r][c._j - 1].focus();
+    }
+    function surTouche(e) {
+      var c = e.target, r = c._r, j = c._j, cible = null;
+      if (e.keyCode === 8 && !c.value && j < n - 1) { cible = lignes[r][j + 1]; }
+      else if (e.keyCode === 37 && j > 0) cible = lignes[r][j - 1];
+      else if (e.keyCode === 39 && j < n - 1) cible = lignes[r][j + 1];
+      else if (e.keyCode === 38 && r > 0) cible = lignes[r - 1][j];
+      else if (e.keyCode === 40 && r < lignes.length - 1) cible = lignes[r + 1][j];
+      if (cible) { cible.focus(); e.preventDefault(); }
+    }
+    grille.appendChild(caseFixe('', -1, 'glab'));
+    for (k = 0; k < n; k++) grille.appendChild(caseFixe(LAB_RANG[n - 1 - k], -1, 'glab'));
+    rangeeEditable('ret', '');
+    nums.forEach(function (x, idx) {
+      var signe = idx === nums.length - 1 ? (op === 'x' ? '×' : (op === '-' ? '−' : '+')) : (op === '+' && idx > 0 ? '+' : '');
+      grille.appendChild(caseFixe(signe, -1, 'gsigne'));
+      for (var j = 0; j < n; j++) { var p = n - 1 - j, d = p < x.length ? x.charAt(x.length - 1 - p) : ''; grille.appendChild(caseFixe(d, p)); }
+    });
+    grille.appendChild(h('div', { 'class': 'gtrait' }));
+    var lignesPart = [];
+    partiels.forEach(function (p, idx) { lignesPart.push(rangeeEditable('part', idx === partiels.length - 1 ? '+' : '')); });
+    if (partiels.length) grille.appendChild(h('div', { 'class': 'gtrait' }));
+    var ligneRes = rangeeEditable('res', '=');
+    zoneG.appendChild(grille);
+    if (op === 'x' && partiels.length) msg.appendChild(h('p', { 'class': 'note' }, 'Une ligne par chiffre du 2e nombre. À partir de la 2e ligne, pense au décalage : mets un 0 dans la colonne des unités, puis un autre à la ligne suivante.'));
+    msg.appendChild(h('p', { 'class': 'aide' }, 'Commence par la colonne des unités (à droite). Quand tu écris un chiffre, la case de gauche s’active toute seule. Les petites cases du haut servent aux retenues.'));
+    courant = { res: res, ligneRes: ligneRes, partiels: partiels, lignesPart: lignesPart, n: n, toutes: lignes };
+    actions.hidden = false;
+    ligneRes[n - 1].focus();
+  }
+  function marquer(c, ok) { c.classList.remove('ok'); c.classList.remove('ko'); if (ok === true) c.classList.add('ok'); else if (ok === false) c.classList.add('ko'); }
+  function verifierLigne(cells, attendu, decalage) {
+    var err = 0, n = cells.length;
+    for (var j = 0; j < n; j++) {
+      var p = n - 1 - j, c = cells[j], v = c.value, e;
+      if (decalage && p < decalage) { if (v === '' || v === '0') marquer(c, v === '0' ? true : null); else { marquer(c, false); err++; } continue; }
+      var q = p - (decalage || 0);
+      e = q < attendu.length ? attendu.charAt(attendu.length - 1 - q) : '';
+      if (e === '') { if (v !== '' && v !== '0') { marquer(c, false); err++; } else marquer(c, null); }
+      else if (v === e) marquer(c, true);
+      else { marquer(c, false); err++; }
+    }
+    return err;
+  }
+  function verifier() {
+    if (!courant) return;
+    var err = 0;
+    courant.partiels.forEach(function (p, i) { err += verifierLigne(courant.lignesPart[i], p.val, p.dec); });
+    err += verifierLigne(courant.ligneRes, courant.res, 0);
+    var ancien = msg.querySelector('.resultat'); if (ancien) ancien.parentNode.removeChild(ancien);
+    if (!err) sonner('juste');
+    msg.insertBefore(h('div', { 'class': 'alerte resultat', style: err ? '' : 'background:#DDF0DB;border-color:#3E8E41' }, err ? err + ' case' + (err > 1 ? 's' : '') + ' à revoir (en orange). Les cases vertes sont justes.' : 'Bravo, tout est juste !'), msg.firstChild);
+  }
+  ajoute(actions, [btn('Vérifier', 'coche', verifier, 'prim'), btn('Effacer mes réponses', 'poubelle', function () {
+    if (!courant) return; courant.toutes.forEach(function (row) { row.forEach(function (c) { c.value = ''; marquer(c, null); }); });
+    var a = msg.querySelector('.resultat'); if (a) a.parentNode.removeChild(a);
+  })]);
+  ajoute(sh, [
+    h('div', { 'class': 'titre' }, 'Ton calcul'),
+    h('p', { 'class': 'aide' }, 'Écris le calcul : les chiffres se placent tout seuls dans les bonnes colonnes. Toi, tu calcules.'),
+    inp,
+    h('div', { 'class': 'rang' }, btn('Poser le calcul', 'operations', poser, 'prim gros'),
+      h('div', { 'class': 'symboles' },
+        h('button', { 'class': 'mini', type: 'button', style: 'width:50px;height:50px;font-size:24px', 'aria-label': 'plus', onclick: function () { inserer('+'); } }, '+'),
+        h('button', { 'class': 'mini', type: 'button', style: 'width:50px;height:50px;font-size:24px', 'aria-label': 'moins', onclick: function () { inserer('−'); } }, '−'),
+        h('button', { 'class': 'mini', type: 'button', style: 'width:50px;height:50px;font-size:24px', 'aria-label': 'fois', onclick: function () { inserer('×'); } }, '×'))),
+    msg, zoneG, actions,
+    h('p', { 'class': 'note' }, 'Additions (jusqu’à 4 nombres), soustractions et multiplications de nombres entiers. Les couleurs repèrent les unités, dizaines et centaines.')
+  ]);
+  if (S.op) poser();
+}
+
+/* =========================================================
+   LAME 10 — Aides (table de Pythagore + fiches)
+   ========================================================= */
+function rAides(sh) {
+  var onglet = 'tables', cont = h('div'), cache = false, vueFiche = null, edite = null;
+  function dessiner() {
+    vider(sh); TTS.stop();
+    sh.appendChild(onglets([['tables', 'Table de multiplication'], ['fiches', 'Mes fiches']], onglet, function (o) { onglet = o; vueFiche = null; edite = null; dessiner(); }));
+    vider(cont); sh.appendChild(cont);
+    if (onglet === 'tables') tables(); else if (edite) edition(); else if (vueFiche) fiche(); else fiches();
+  }
+  function tables() {
+    var res = h('div', { 'class': 'resultat-pyth lisible', 'aria-live': 'polite' }, 'Touche une case.');
+    var t = h('table', { 'class': 'pyth' }), cells = [], i, j;
+    var tr = h('tr', null, h('th', null, '×'));
+    for (j = 1; j <= 10; j++) tr.appendChild(h('th', null, String(j)));
+    t.appendChild(tr);
+    for (i = 1; i <= 10; i++) {
+      tr = h('tr', null, h('th', null, String(i))); cells.push([]);
+      for (j = 1; j <= 10; j++) {
+        var td = h('td', { tabindex: '0' }, cache ? '' : String(i * j));
+        td._i = i; td._j = j;
+        td.addEventListener('click', choisir); td.addEventListener('keydown', function (e) { if (e.keyCode === 13 || e.keyCode === 32) { e.preventDefault(); choisir.call(this, e); } });
+        tr.appendChild(td); cells[i - 1].push(td);
+      }
+      t.appendChild(tr);
+    }
+    function choisir(e) {
+      var c = e.currentTarget || this, a = c._i, b = c._j;
+      cells.forEach(function (row) { row.forEach(function (x) { x.className = (x._i === a || x._j === b) ? 'hl' : ''; }); });
+      c.className = 'sel'; c.textContent = String(a * b);
+      res.textContent = a + ' × ' + b + ' = ' + (a * b);
+    }
+    ajoute(cont, [res,
+      h('div', { 'class': 'rang' }, btn('Écouter', 'lecteur', function () { var m = res.textContent.match(/(\d+) × (\d+) = (\d+)/); if (m) TTS.dire(m[1] + ' fois ' + m[2] + ', égale ' + m[3], 'fr'); }, 'petit')),
+      h('div', { 'class': 'pyth-w' }, t),
+      bascule('Cacher les résultats (pour m’entraîner)', cache, function (on) { cache = on; dessiner(); })]);
+  }
+  function fiches() {
+    var g = h('div', { 'class': 'fiches' });
+    S.fiches.forEach(function (f) { g.appendChild(h('button', { 'class': 'fiche', type: 'button', style: '--fc:' + f.c, onclick: function () { vueFiche = f; dessiner(); } }, h('b', null, f.titre), h('span', null, f.txt))); });
+    ajoute(cont, [h('p', { 'class': 'aide' }, 'Tes fiches outils : les règles et astuces que tu as le droit d’utiliser. Touche une fiche pour l’ouvrir en grand.'), g,
+      h('div', { 'class': 'rang', style: 'margin-top:16px' }, btn('Nouvelle fiche', 'plus', function () { edite = { id: '', titre: '', txt: '', c: COUL_MAT[S.fiches.length % COUL_MAT.length] }; dessiner(); }, 'prim'))]);
+  }
+  function fiche() {
+    var f = vueFiche;
+    ajoute(cont, [
+      h('div', { 'class': 'carte-item', style: 'border-top:8px solid ' + f.c },
+        h('div', { 'class': 'titre', style: 'margin-top:0' }, f.titre),
+        h('div', { 'class': 'lisible fiche-vue' }, f.txt)),
+      h('div', { 'class': 'rang' },
+        btn('Écouter', 'lecteur', function () { TTS.dire(f.titre + '. ' + f.txt.replace(/→/g, ', donc, ').replace(/[✔✘]/g, ''), 'fr'); }, 'prim'),
+        btn('Modifier', 'crayon', function () { edite = f; dessiner(); }),
+        btn('Toutes mes fiches', null, function () { vueFiche = null; dessiner(); }))
+    ]);
+  }
+  function edition() {
+    var f = edite, couleur = f.c;
+    var ti = h('input', { type: 'text', value: f.titre, placeholder: 'Titre de la fiche', 'aria-label': 'Titre' });
+    var tx = h('textarea', { 'class': 'lisible', rows: '8', value: f.txt, placeholder: 'La règle, l’astuce, un exemple…', 'aria-label': 'Contenu' });
+    var coul = h('div', { 'class': 'rang' });
+    COUL_MAT.forEach(function (c) { var b = h('button', { type: 'button', 'class': 'mini', style: 'background:' + c + (couleur === c ? ';box-shadow:0 0 0 3px #1E2226' : ''), 'aria-label': 'Couleur', onclick: function () { couleur = c; var bs = coul.querySelectorAll('button'); for (var k = 0; k < bs.length; k++) bs[k].style.boxShadow = 'none'; b.style.boxShadow = '0 0 0 3px #1E2226'; } }); coul.appendChild(b); });
+    ajoute(cont, [h('label', { 'class': 'lab' }, 'Titre'), ti, h('label', { 'class': 'lab' }, 'Contenu'), tx, h('label', { 'class': 'lab' }, 'Couleur'), coul,
+      h('div', { 'class': 'rang', style: 'margin-top:16px' },
+        btn('Enregistrer', 'coche', function () {
+          if (!ti.value.trim()) { ti.focus(); return; }
+          f.titre = ti.value.trim(); f.txt = tx.value; f.c = couleur;
+          if (!f.id) { f.id = uid(); S.fiches.push(f); }
+          sauver(); vueFiche = f; edite = null; dessiner();
+        }, 'prim'),
+        f.id ? btn('Supprimer', 'poubelle', function () { S.fiches.splice(S.fiches.indexOf(f), 1); sauver(); edite = null; vueFiche = null; dessiner(); }) : null,
+        btn('Annuler', null, function () { edite = null; dessiner(); }))]);
+  }
+  dessiner();
+}
+
+/* =========================================================
+   LAME 11 — Pause
+   ========================================================= */
+var MOUVEMENTS = [
+  'Étire tes bras vers le plafond, le plus haut possible. Puis relâche.',
+  'Serre fort tes poings pendant 5 secondes… puis ouvre grand les mains.',
+  'Fais rouler doucement tes épaules vers l’arrière, plusieurs fois.',
+  'Pose tes pieds bien à plat. Appuie dans le sol, comme pour le pousser.'
+];
+function rPause(sh) {
+  var mode = 'respirer', minuteurs = [];
+  function plus(fn, ms) { minuteurs.push(setTimeout(fn, ms)); }
+  function stopTout() { minuteurs.forEach(clearTimeout); minuteurs = []; }
+  nettoyages.push(stopTout);
+  function dessiner() {
+    stopTout(); vider(sh);
+    ajoute(sh, [h('div', { 'class': 'rang', style: 'justify-content:center;margin-top:0' }, choix([['respirer', 'Respirer'], ['bouger', 'Bouger']], mode, function (m) { mode = m; dessiner(); }))]);
+    if (mode === 'respirer') respirer(); else bouger();
+  }
+  function finir(zone) {
+    vider(zone);
+    var prec = outilPrecedent && outilPrecedent !== 'pause' ? outil(outilPrecedent) : null;
+    ajoute(zone, [h('div', { 'class': 'etape-txt', style: 'text-align:center' }, 'Bien joué. Prêt·e à reprendre ?'),
+      h('div', { 'class': 'rang', style: 'justify-content:center' },
+        prec ? btn('Retourner à : ' + prec.nom, 'retour', function () { aller(prec.id); }, 'prim gros') : btn('Revenir au couteau', 'retour', function () { aller(''); }, 'prim gros'),
+        btn('Encore une minute', 'reprendre', dessiner))]);
+  }
+  function respirer() {
+    var zone = h('div', { 'class': 'souffle' }), bulle = h('div', { 'class': 'bulle', 'aria-live': 'polite' }, 'Prêt ?'), info = h('div', { 'class': 'aide' }, '6 respirations lentes : environ une minute.');
+    var go = btn('Commencer', 'lire', function () { go.hidden = true; cycle(0); }, 'prim gros');
+    ajoute(zone, [bulle, info, go]); sh.appendChild(zone);
+    function cycle(i) {
+      if (i >= 6) { finir(zone); return; }
+      info.textContent = 'Respiration ' + (i + 1) + ' sur 6';
+      bulle.style.transitionDuration = '4s'; bulle.textContent = 'Inspire…'; bulle.style.transform = 'scale(1)';
+      plus(function () {
+        bulle.style.transitionDuration = '6s'; bulle.textContent = 'Souffle…'; bulle.style.transform = 'scale(.62)';
+        plus(function () { cycle(i + 1); }, 6000);
+      }, 4000);
+    }
+  }
+  function bouger() {
+    var zone = h('div', { 'class': 'souffle' }), txt = h('div', { 'class': 'mouvement', 'aria-live': 'polite' }, '4 petits mouvements, assis·e à ta place. 15 secondes chacun.');
+    var barreP = h('div', { 'class': 'barre-prog' }, h('i')), go = btn('Commencer', 'lire', function () { go.hidden = true; etape(0); }, 'prim gros');
+    ajoute(zone, [txt, barreP, go]); sh.appendChild(zone);
+    function etape(i) {
+      if (i >= MOUVEMENTS.length) { finir(zone); return; }
+      txt.textContent = MOUVEMENTS[i]; var t0 = Date.now(), fill = barreP.firstChild;
+      (function anim() { var p = Math.min(1, (Date.now() - t0) / 15000); fill.style.width = (p * 100) + '%'; if (p < 1) plus(anim, 250); else etape(i + 1); })();
+    }
+  }
+  dessiner();
+}
+
+/* =========================================================
+   LAME 12 — Météo intérieure
+   ========================================================= */
+var NUAGE = '<path d="M20 58h40a12 12 0 0 0 1-24 17 17 0 0 0-32-3 13 13 0 0 0-9 27z" fill="#FFFFFF" stroke="#2A2F35" stroke-width="3" stroke-linejoin="round"/>';
+var METEOS = [
+  { id: 'soleil', nom: 'Concentré·e', svg: '<circle cx="40" cy="40" r="14" fill="#F2B33D" stroke="#2A2F35" stroke-width="3"/><g stroke="#2A2F35" stroke-width="3" stroke-linecap="round"><path d="M40 10v8M40 62v8M10 40h8M62 40h8M19 19l6 6M55 55l6 6M19 61l6-6M55 25l6-6"/></g>', msg: 'Super moment pour attaquer ce qui est le plus difficile.', o: ['etapes', 'sablier'] },
+  { id: 'nuages', nom: 'Un peu ailleurs', svg: '<circle cx="30" cy="30" r="11" fill="#F2B33D" stroke="#2A2F35" stroke-width="3"/>' + NUAGE, msg: 'Ton attention flotte un peu. Un objectif court, avec le sablier, va t’aider à revenir.', o: ['sablier', 'etapes'] },
+  { id: 'pluie', nom: 'Fatigué·e, découragé·e', svg: NUAGE.replace('#FFFFFF', '#DDE2E7') + '<g stroke="#2E6DB4" stroke-width="3" stroke-linecap="round"><path d="M28 64l-3 8M40 64l-3 8M52 64l-3 8"/></g>', msg: 'Ça arrive à tout le monde. Fais une petite pause, puis commence par une toute petite étape.', o: ['pause', 'etapes'] },
+  { id: 'orage', nom: 'Agité·e, énervé·e', svg: NUAGE.replace('#FFFFFF', '#B9C0C8') + '<path d="M42 58l-8 12h8l-4 10 12-15h-8l4-7z" fill="#F2B33D" stroke="#2A2F35" stroke-width="2.5" stroke-linejoin="round"/>', msg: 'Ton corps a besoin de relâcher la pression avant de travailler. Bouge un peu, ou respire.', o: ['pause', 'sablier'] },
+  { id: 'brouillard', nom: 'Perdu·e, je ne comprends pas', svg: '<g stroke="#2A2F35" stroke-width="3" stroke-linecap="round" fill="none"><path d="M12 28c6-4 10 4 16 0s10 4 16 0 10 4 16 0"/><path d="M16 42c6-4 10 4 16 0s10 4 16 0 10 4 16 0"/><path d="M12 56c6-4 10 4 16 0s10 4 16 0 10 4 16 0"/></g>', msg: 'Ne reste pas bloqué·e. Relis la consigne avec le décodeur, ou lève la main : demander de l’aide, c’est une stratégie.', o: ['consignes', 'carte'] }
+];
+function svgMeteo(m) { return '<svg viewBox="0 0 80 80" aria-hidden="true">' + m.svg + '</svg>'; }
+function rMeteo(sh) {
+  var choisi = null, rep = h('div');
+  var g = h('div', { 'class': 'meteos' });
+  METEOS.forEach(function (m) {
+    var b = h('button', { 'class': 'meteo-btn', type: 'button', onclick: function () {
+      choisi = m; var bs = g.querySelectorAll('button'); for (var k = 0; k < bs.length; k++) bs[k].className = 'meteo-btn'; b.className = 'meteo-btn on';
+      S.meteo.push({ d: new Date().toISOString(), s: m.id }); if (S.meteo.length > 30) S.meteo.shift(); sauver();
+      reponse(); releves();
+    } }, h('span', { html: svgMeteo(m) }), m.nom);
+    g.appendChild(b);
+  });
+  function reponse() {
+    vider(rep);
+    rep.appendChild(h('div', { 'class': 'carte-item', style: 'margin-top:16px' },
+      h('div', { 'class': 'lisible' }, choisi.msg),
+      h('div', { 'class': 'rang' }, choisi.o.map(function (id) { var o = outil(id); return btn(o.nom, o.ic, function () { aller(id); }, 'prim'); }))));
+  }
+  var zr = h('div');
+  function releves() {
+    vider(zr);
+    var dern = S.meteo.slice(-12);
+    if (!dern.length) return;
+    zr.appendChild(h('div', { 'class': 'titre' }, 'Mes derniers relevés'));
+    var r = h('div', { 'class': 'releves' });
+    dern.forEach(function (x) {
+      var m = trouve(METEOS, function (y) { return y.id === x.s; }), d = new Date(x.d);
+      if (m) r.appendChild(h('div', { 'class': 'releve', title: m.nom }, h('span', { html: svgMeteo(m) }), JOURS[d.getDay()].slice(0, 3) + ' ' + pad2(d.getHours()) + 'h'));
+    });
+    zr.appendChild(r);
+    zr.appendChild(h('div', { 'class': 'rang' }, btn('Effacer mes relevés', 'poubelle', function () { S.meteo = []; sauver(); releves(); }, 'petit')));
+  }
+  ajoute(sh, [h('div', { 'class': 'titre' }, 'Quel temps fait-il dans ta tête ?'), h('p', { 'class': 'aide' }, 'Il n’y a pas de mauvaise réponse. Choisis la météo qui te ressemble maintenant.'), g, rep, zr]);
+  releves();
+}
+
+/* =========================================================
+   LAME 13 — Ma carte de besoins
+   ========================================================= */
+var AIDES_CARTE = [
+  'Des textes agrandis et aérés', 'Une police plus lisible', 'Qu’on me lise les consignes à voix haute', 'Une consigne à la fois',
+  'Du temps en plus', 'Moins d’exercices, mais les mêmes compétences évaluées', 'Utiliser un ordinateur ou une tablette',
+  'Avoir la photocopie au lieu de recopier le tableau', 'Être placé·e devant, loin des distractions', 'Pouvoir bouger ou avoir un objet anti-stress',
+  'Faire de courtes pauses', 'Ne pas lire à voix haute devant la classe sans être prévenu·e', 'Utiliser la calculatrice',
+  'Avoir mes fiches outils pendant le travail', 'Être évalué·e à l’oral quand c’est possible', 'Qu’on vérifie que j’ai bien noté les devoirs'
+];
+function fermerPlein() { var p = $('#plein'); if (p && !p.hidden) { p.hidden = true; vider(p); } }
+function montrerCarte() {
+  var C = S.carte, p = $('#plein'); vider(p);
+  var toutes = C.aides.concat(C.perso);
+  var corps = h('div', { 'class': 'corps' });
+  if (C.jai.trim()) ajoute(corps, [h('h4', null, 'Ce que j’ai envie que vous sachiez'), h('div', null, C.jai)]);
+  if (toutes.length) ajoute(corps, [h('h4', null, 'Ce qui m’aide'), h('ul', null, toutes.map(function (a) { return h('li', null, a); }))]);
+  if (C.difficile.trim()) ajoute(corps, [h('h4', null, 'Ce qui est difficile pour moi'), h('div', null, C.difficile)]);
+  if (C.decroche.trim()) ajoute(corps, [h('h4', null, 'Si je décroche, vous pouvez…'), h('div', null, C.decroche)]);
+  if (!corps.firstChild) corps.appendChild(h('div', null, 'La carte est encore vide.'));
+  p.className = 'plein';
+  ajoute(p, [
+    h('div', { 'class': 'rang no-print' }, btn('Fermer', 'croix', fermerPlein, 'prim'), btn('Imprimer', 'imprimer', function () { window.print(); })),
+    h('div', { 'class': 'carte-id' },
+      h('div', { 'class': 'bandeau' }, h('b', null, 'Comment m’aider en classe'), h('h2', null, (C.prenom || S.prenom || 'Ma carte') + (C.classe ? ' · ' + C.classe : ''))),
+      corps)
+  ]);
+  p.hidden = false; p.scrollTop = 0;
+}
+function rCarte(sh) {
+  var C = S.carte;
+  if (!C.prenom && S.prenom) C.prenom = S.prenom;
+  function champ(label, cle, ph, zone) {
+    var e = zone ? h('textarea', { 'class': 'lisible', rows: '3', value: C[cle], placeholder: ph, 'aria-label': label }) : h('input', { type: 'text', value: C[cle], placeholder: ph, 'aria-label': label });
+    e.addEventListener('input', function () { C[cle] = e.value; sauver(); });
+    return [h('label', { 'class': 'lab' }, label), e];
+  }
+  var cases = h('div');
+  AIDES_CARTE.forEach(function (a) {
+    var on = C.aides.indexOf(a) >= 0;
+    var b = h('button', { 'class': 'ligne-coche' + (on ? ' fait' : ''), type: 'button', style: 'font-size:16px', 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+      var k = C.aides.indexOf(a); if (k < 0) C.aides.push(a); else C.aides.splice(k, 1); sauver();
+      b.className = 'ligne-coche' + (k < 0 ? ' fait' : ''); b.setAttribute('aria-pressed', k < 0 ? 'true' : 'false');
+    } }, h('span', { 'class': 'case' }, ico('coche')), h('span', null, a));
+    cases.appendChild(b);
+  });
+  var perso = h('div');
+  function majPerso() {
+    vider(perso);
+    C.perso.forEach(function (a, i) { perso.appendChild(h('div', { 'class': 'ligne-etape' }, h('span', { style: 'flex:1' }, a), h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Retirer', onclick: function () { C.perso.splice(i, 1); sauver(); majPerso(); } }, ico('poubelle')))); });
+    var inp = h('input', { type: 'text', placeholder: 'Autre chose qui m’aide…', 'aria-label': 'Autre aide', onkeydown: function (e) { if (e.keyCode === 13) plus(); } });
+    function plus() { if (inp.value.trim()) { C.perso.push(inp.value.trim()); sauver(); majPerso(); } }
+    perso.appendChild(h('div', { 'class': 'ligne-etape' }, inp, btn('Ajouter', 'plus', plus, 'petit')));
+  }
+  majPerso();
+  ajoute(sh, [
+    h('p', { 'class': 'aide' }, 'Ta carte sert à expliquer à un prof (un remplaçant, un nouveau prof…) ce qui t’aide. C’est toi qui choisis ce que tu y mets, et elle reste sur ton appareil.'),
+    h('div', { 'class': 'rang' }, btn('Montrer ma carte', 'carte', montrerCarte, 'prim gros')),
+    h('div', { 'class': 'grille2' }, h('div', null, champ('Prénom', 'prenom', 'Ton prénom')), h('div', null, champ('Classe', 'classe', 'Exemple : 4e B'))),
+    champ('Ce que j’ai envie que les profs sachent (facultatif)', 'jai', 'Exemple : lire me demande beaucoup d’énergie, je me fatigue vite.', true),
+    h('div', { 'class': 'titre' }, 'Ce qui m’aide'),
+    cases, perso,
+    champ('Ce qui est difficile pour moi', 'difficile', 'Exemple : copier vite au tableau, les textes très longs.', true),
+    champ('Si je décroche, vous pouvez…', 'decroche', 'Exemple : me faire un petit signe, sans m’interpeller devant tout le monde.', true),
+    h('div', { 'class': 'rang', style: 'margin-top:18px' }, btn('Montrer ma carte', 'carte', montrerCarte, 'prim'))
+  ]);
+}
+
+/* =========================================================
+   Atelier
+   ========================================================= */
+function rAtelier() {
+  quitter(); outilCourant = 'atelier';
+  barre('outil', 'Atelier');
+  var sh = feuille();
+  var zl = h('div');
+  function lames() {
+    vider(zl);
+    var montees = S.lames.filter(function (id) { return !!outil(id); }), autres = OUTILS.filter(function (o) { return montees.indexOf(o.id) < 0; });
+    montees.forEach(function (id, i) {
+      var o = outil(id);
+      zl.appendChild(h('div', { 'class': 'ligne-lame' }, ico(o.ic), h('div', { 'class': 'grow' }, h('b', null, o.nom), h('small', null, o.sous)),
+        h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Monter ' + o.nom, disabled: i === 0, onclick: function () { S.lames.splice(i - 1, 0, S.lames.splice(i, 1)[0]); sauver(); lames(); } }, ico('haut')),
+        h('button', { 'class': 'mini', type: 'button', 'aria-label': 'Descendre ' + o.nom, disabled: i === montees.length - 1, onclick: function () { S.lames.splice(i + 1, 0, S.lames.splice(i, 1)[0]); sauver(); lames(); } }, ico('bas')),
+        h('input', { type: 'checkbox', 'class': 'sw', checked: true, 'aria-label': 'Lame montée : ' + o.nom, onchange: function () { S.lames.splice(S.lames.indexOf(id), 1); sauver(); lames(); } })));
+    });
+    if (autres.length) zl.appendChild(h('div', { 'class': 'aide', style: 'margin-top:14px' }, 'Lames rangées dans la boîte :'));
+    autres.forEach(function (o) {
+      zl.appendChild(h('div', { 'class': 'ligne-lame off' }, ico(o.ic), h('div', { 'class': 'grow' }, h('b', null, o.nom), h('small', null, o.sous)),
+        h('input', { type: 'checkbox', 'class': 'sw', checked: false, 'aria-label': 'Monter la lame ' + o.nom, onchange: function () { S.lames.push(o.id); sauver(); lames(); } })));
+    });
+  }
+  lames();
+  var manches = h('div', { 'class': 'manches' });
+  Object.keys(COULEURS).forEach(function (k) {
+    var b = h('button', { type: 'button', 'class': 'manche-c' + (S.couleur === k ? ' on' : ''), style: 'background:' + COULEURS[k].c, 'aria-label': 'Manche ' + COULEURS[k].nom, onclick: function () {
+      S.couleur = k; sauver(); appliquerTheme(); var bs = manches.querySelectorAll('button'); for (var i = 0; i < bs.length; i++) bs[i].className = 'manche-c'; b.className = 'manche-c on';
+    } });
+    manches.appendChild(b);
+  });
+  var grav = h('input', { type: 'text', maxlength: '18', value: S.prenom, placeholder: 'Ton prénom', 'aria-label': 'Gravure', oninput: function () { S.prenom = grav.value.trim(); sauver(); } });
+  var conf = h('div'); controlesLecture(conf);
+  var fichier = h('input', { type: 'file', accept: '.json,application/json', hidden: true, onchange: function () {
+    var f = fichier.files[0]; if (!f) return;
+    var lr = new FileReader();
+    lr.onload = function () {
+      try { var d = JSON.parse(lr.result); if (!d || typeof d !== 'object' || d.v !== 1) throw new Error('format'); S = remplir(DEFAUT, d); sauver(); appliquerTheme(); toast('Sauvegarde importée.'); rAtelier(); }
+      catch (e) { toast('Ce fichier n’est pas une sauvegarde du Multitool.'); }
+    };
+    lr.readAsText(f);
+  } });
+  var bEffacer = btn('Tout effacer', 'poubelle', function () {
+    if (bEffacer._arme) { try { localStorage.removeItem(CLE); } catch (e) { } S = clone(DEFAUT); appliquerTheme(); toast('Tout a été effacé.'); aller(''); return; }
+    bEffacer._arme = true; vider(bEffacer); ajoute(bEffacer, [ico('poubelle'), 'Sûr·e ? Touche encore pour effacer']);
+    setTimeout(function () { bEffacer._arme = false; vider(bEffacer); ajoute(bEffacer, [ico('poubelle'), 'Tout effacer']); }, 4000);
+  }, 'petit');
+  ajoute(sh, [
+    h('div', { 'class': 'titre' }, 'Mes lames'),
+    h('p', { 'class': 'aide' }, 'Monte les lames qui t’aident, range les autres. Les flèches changent l’ordre sur le couteau.'), zl,
+    h('div', { 'class': 'titre' }, 'Couleur du manche'), manches,
+    h('div', { 'class': 'titre' }, 'Gravure'), grav,
+    h('div', { 'class': 'titre' }, 'Confort de lecture'), conf,
+    h('div', { 'class': 'titre' }, 'Sons'), bascule('Petits sons (fin du sablier, étape faite)', S.sons, function (on) { S.sons = on; sauver(); }),
+    h('div', { 'class': 'titre' }, 'Sauvegarde'),
+    h('p', { 'class': 'aide' }, 'Tout est enregistré sur cet appareil uniquement. Pour changer d’appareil, exporte une sauvegarde puis importe-la sur l’autre.'),
+    h('div', { 'class': 'rang' },
+      btn('Exporter ma sauvegarde', 'telecharger', function () {
+        var blob = new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' }), a = h('a', { href: URL.createObjectURL(blob), download: 'multitool-sauvegarde-' + isoJour(new Date()) + '.json' });
+        document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 500);
+      }),
+      btn('Importer une sauvegarde', 'ouvrir', function () { fichier.click(); }), fichier),
+    h('div', { 'class': 'rang', style: 'margin-top:20px' },
+      btn('Refaire le montage', 'reprendre', function () { S.monte = false; sauver(); aller(''); }, 'petit'), bEffacer),
+    h('p', { 'class': 'note', style: 'margin-top:24px' }, 'Multitool · by BROT2YOU — fonctionne sans compte et sans connexion une fois la page chargée (sauf certaines voix de lecture).')
+  ]);
+}
+
+/* =========================================================
+   Démarrage
+   ========================================================= */
+appliquerTheme();
+route();
+
+})();
+</script>
+</body>
+</html>
