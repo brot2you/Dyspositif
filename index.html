@@ -574,7 +574,7 @@ var DEFAUT = {
   fiches: FICHES_DEF,
   meteo: [],
   carte: { prenom: '', classe: '', jai: '', aides: [], perso: [], difficile: '', decroche: '' },
-  volume: 0.7,
+  volume: 0.7, sonsBoutons: true,
   stats: {}, collants: {}, journal: [], sacFaits: {}, fetes: true, lamesProf: [],
   focus: { actif: false, tache: '', label: '', duree: 15, faites: 0, compte: false },
   prof: { edt: { on: false, jours: { '1': [], '2': [], '3': [], '4': [], '5': [] } }, txt: { on: false, t: '', l: 'en' }, cons: { on: false, t: '' }, tache: { on: false, t: '', s: '' }, dev: { on: false, m: 'Anglais', q: '', p: '' }, fiche: { on: false, t: '', x: '' } }
@@ -701,16 +701,45 @@ function jouerSon(c, bus, type, t, n) {
     note(c, bus, 1046.5, t + 0.42, 'cloche', 0.16); note(c, bus, 1568, t + 0.42, 'cloche', 0.1);
     scintille(c, bus, t + 0.5, 0.07);
   }
+  else if (type === 'tap') {
+    var o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+    o.type = 'triangle'; f.type = 'lowpass'; f.frequency.value = 2400;
+    o.frequency.setValueAtTime(1150, t); o.frequency.exponentialRampToValueAtTime(620, t + 0.035);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.38, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
+    o.connect(f); f.connect(g); g.connect(bus); o.start(t); o.stop(t + 0.09);
+  }
+  else if (type === 'ouvrir') { pop(c, bus, t, 0.2, true); note(c, bus, 1046.5, t + 0.04, 'marimba', 0.14); }
+  else if (type === 'retour') {
+    var o2 = c.createOscillator(), g2 = c.createGain();
+    o2.type = 'triangle'; o2.frequency.setValueAtTime(820, t); o2.frequency.exponentialRampToValueAtTime(330, t + 0.09);
+    g2.gain.setValueAtTime(0.0001, t); g2.gain.exponentialRampToValueAtTime(0.32, t + 0.006); g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
+    o2.connect(g2); g2.connect(bus); o2.start(t); o2.stop(t + 0.18);
+  }
+  else if (type === 'oui') { note(c, bus, 880, t, 'marimba', 0.2); note(c, bus, 1318.5, t + 0.06, 'marimba', 0.14); }
+  else if (type === 'non') { note(c, bus, 659.25, t, 'marimba', 0.18); }
   else if (type === 'inspire') { souffleDoux(c, bus, t, true, 0.12); note(c, bus, 659.25, t, 'cloche', 0.2); }
   else if (type === 'expire') { souffleDoux(c, bus, t, false, 0.12); note(c, bus, 493.88, t, 'cloche', 0.18); }
   else { note(c, bus, 880, t, 'marimba', 0.3); }
 }
+var tapEnAttente = null, SONS_UI = { tap: 1, ouvrir: 1, retour: 1, oui: 1, non: 1 };
 function sonner(type, n) {
+  if (!SONS_UI[type] && tapEnAttente) { clearTimeout(tapEnAttente); tapEnAttente = null; }
   if (!S.sons) return;
   var a = audioPret(); if (!a || !sonBus) return;
   sonBus.maitre.gain.value = typeof S.volume === 'number' ? S.volume : 0.7;
   jouerSon(a, sonBus.entree, type, a.currentTime + 0.02, n);
 }
+document.addEventListener('click', function (e) {
+  if (!S.sonsBoutons || !S.sons) return;
+  var el = e.target && e.target.closest ? e.target.closest('button, a.btn, input.sw, input[type=checkbox]') : null;
+  if (!el || el.disabled) return;
+  var type = 'tap';
+  if (el.matches('input.sw, input[type=checkbox]')) type = el.checked ? 'oui' : 'non';
+  else if (el.matches('.tuile, .puce-lame, .info, .choix-tache, .meteo-btn, .fiche, .pack, .collant')) type = 'ouvrir';
+  else if (el.getAttribute('aria-label') === 'Revenir à l’accueil') type = 'retour';
+  clearTimeout(tapEnAttente);
+  tapEnAttente = setTimeout(function () { tapEnAttente = null; sonner(type); }, 0);
+}, true);
 /* pour les tests : fabrique un son hors ligne */
 window.__b2yRendreSon = function (type, n) {
   var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext, c = new OAC(2, 44100 * 2.6, 44100), bus = construireBus(c, c.destination);
@@ -2992,6 +3021,7 @@ function rAtelier() {
     h('div', { 'class': 'titre' }, 'Gravure'), grav,
     h('div', { 'class': 'titre' }, 'Confort de lecture'), conf,
     h('div', { 'class': 'titre' }, 'Sons'), bascule('Petits sons (étape faite, sac prêt, fin du sablier, autocollant…)', S.sons, function (on) { S.sons = on; sauver(); }),
+    bascule('Petit son quand je touche un bouton', S.sonsBoutons, function (on) { S.sonsBoutons = on; sauver(); }),
     h('label', { 'class': 'lab' }, 'Volume'),
     (function () { var r = h('input', { type: 'range', min: '0.1', max: '1', step: '0.05', value: S.volume, 'aria-label': 'Volume des sons', onchange: function () { S.volume = parseFloat(r.value); sauver(); sonner('etape'); } }); return r; })(),
     h('div', { 'class': 'echelle' }, h('span', null, 'doux'), h('span', null, 'fort')),
