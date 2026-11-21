@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<script src="https://brot2you.github.io/b2y-outils/b2y-sauvegarde.js" data-app="Dyspositif" data-keys="brot2you-multitool-v1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dyspositif — Dys+ by BROT2YOU</title>
 <link rel="icon" href="data:image/svg+xml,<svg viewBox='0 0 56 48' xmlns='http://www.w3.org/2000/svg'><rect x='2' y='6' width='44' height='38' rx='11' fill='%23FFB547' stroke='%231D1B2E' stroke-width='3'/><text x='24' y='32' text-anchor='middle' font-family='Fredoka,Lexend,sans-serif' font-weight='700' font-size='17' fill='%231D1B2E'>Dys</text><circle cx='44' cy='11' r='9.5' fill='%23E8413B' stroke='%231D1B2E' stroke-width='3'/><path d='M44 6.5v9M39.5 11h9' stroke='%23fff' stroke-width='3' stroke-linecap='round'/></svg>">
@@ -537,7 +538,7 @@ var DEFAUT = {
   v: 1, monte: false, prenom: '', couleur: 'rouge', sons: true,
   lames: ['lecteur', 'consignes', 'etapes', 'sablier', 'sac', 'pause'],
   lecture: { police: 'Lexend', taille: 20, interligne: 1.7, lettres: 0.02, mots: 0.12, fond: 'creme' },
-  lecteur: { texte: '', lang: 'fr', vitesse: 0.9, voix: { fr: '', en: '' }, suivre: true },
+  lecteur: { texte: '', lang: 'fr', vitesse: 0.9, voix: { fr: '', en: '', es: '' }, suivre: true },
   syl: { texte: '', mode: 'couleurs', palette: 0, muettes: true, sons: false },
   consigne: '',
   etapes: { list: [], active: '' },
@@ -634,12 +635,13 @@ var TTS = {
     var l = TTS.pour(lang), nom = S.lecteur.voix[lang], i;
     for (i = 0; i < l.length; i++) if (l[i].name === nom) return l[i];
     if (lang === 'en') { for (i = 0; i < l.length; i++) if (/en-gb/i.test(l[i].lang.replace('_', '-'))) return l[i]; }
+    if (lang === 'es') { for (i = 0; i < l.length; i++) if (/es-es/i.test(l[i].lang.replace('_', '-'))) return l[i]; }
     for (i = 0; i < l.length; i++) if (l[i].localService) return l[i];
     return l[0] || null;
   },
   enonce: function (texte, lang, vitesse) {
     var u = new window.SpeechSynthesisUtterance(texte);
-    u.lang = lang === 'en' ? 'en-GB' : 'fr-FR';
+    u.lang = lang === 'en' ? 'en-GB' : (lang === 'es' ? 'es-ES' : 'fr-FR');
     var v = TTS.choisir(lang); if (v) u.voice = v;
     u.rate = vitesse || S.lecteur.vitesse;
     return u;
@@ -972,6 +974,7 @@ document.addEventListener('keydown', function (e) { if (e.keyCode === 27) { ferm
    ========================================================= */
 var EXEMPLES = {
   fr: "Le vieux phare se dressait au bout de la jetée. Chaque soir, Lina montait les cent vingt marches pour allumer la grande lampe. Ce soir-là, une silhouette l'attendait en haut de l'escalier. Elle retint son souffle : qui pouvait bien être là ?",
+  es: "Cada mañana, Lucía va al instituto en bicicleta. Le gusta escuchar música por el camino. Hoy hace sol y el cielo está muy azul. ¿Va a llegar tarde? ¡No, hoy ha salido temprano!",
   en: "Every morning, Sam walks his dog to the park. He usually takes a ball and a bottle of water. Today, it is raining, so he is wearing his yellow raincoat. Is the dog happy? Of course! He loves the rain."
 };
 var RE_MOT = /[A-Za-zÀ-ÖØ-öø-ÿŒœÆæ0-9]+(?:['’\-][A-Za-zÀ-ÖØ-öø-ÿŒœÆæ0-9]+)*/g;
@@ -1016,7 +1019,7 @@ function rLecteur(sh) {
     ajoute(sh, [
       h('div', { 'class': 'titre' }, 'Ton texte'),
       h('p', { 'class': 'aide' }, 'Colle un texte (Ctrl + V), tape-le, ou essaie avec l’exemple.'),
-      h('div', { 'class': 'rang' }, h('span', null, 'Langue du texte :'), choix([['fr', 'Français'], ['en', 'English']], st.lang, function (l) { st.lang = l; sauver(); })),
+      h('div', { 'class': 'rang' }, h('span', null, 'Langue du texte :'), choix([['fr', 'Français'], ['en', 'English'], ['es', 'Español']], st.lang, function (l) { st.lang = l; sauver(); })),
       ta,
       h('div', { 'class': 'rang' }, bLire,
         btn('Exemple', null, function () { ta.value = EXEMPLES[st.lang]; st.texte = ta.value; sauver(); bLire.disabled = false; }),
@@ -1069,7 +1072,7 @@ function rLecteur(sh) {
     function remplirVoix() {
       vider(selVoix);
       var l = TTS.pour(st.lang), v = TTS.choisir(st.lang);
-      if (!l.length) selVoix.appendChild(h('option', { value: '' }, st.lang === 'en' ? 'Aucune voix anglaise trouvée' : 'Aucune voix française trouvée'));
+      if (!l.length) selVoix.appendChild(h('option', { value: '' }, 'Aucune voix ' + ({ fr: 'française', en: 'anglaise', es: 'espagnole' }[st.lang] || '') + ' trouvée sur cet appareil'));
       l.forEach(function (x) { var o = h('option', { value: x.name }, x.name.replace(/Microsoft |Google /, '') + (x.localService ? '' : ' (en ligne)')); if (v && v.name === x.name) o.selected = true; selVoix.appendChild(o); });
     }
     remplirVoix(); TTS.surChange = remplirVoix;
@@ -1082,7 +1085,7 @@ function rLecteur(sh) {
       h('div', { 'class': 'grille2', style: 'margin-top:12px' },
         h('div', null, h('label', { 'class': 'lab' }, 'Vitesse'), vit, h('div', { 'class': 'echelle' }, h('span', null, 'lente'), h('span', null, 'normale'), h('span', null, 'rapide'))),
         h('div', null, h('label', { 'class': 'lab' }, 'Voix'), selVoix)),
-      h('div', { 'class': 'rang' }, h('span', null, 'Langue :'), choix([['fr', 'Français'], ['en', 'English']], st.lang, function (l) { st.lang = l; sauver(); stop(); remplirVoix(); })),
+      h('div', { 'class': 'rang' }, h('span', null, 'Langue :'), choix([['fr', 'Français'], ['en', 'English'], ['es', 'Español']], st.lang, function (l) { st.lang = l; sauver(); stop(); remplirVoix(); })),
       bascule('Règle de lecture (elle suit ton doigt ou ta souris)', false, function (on) { rg.basculer(on); }),
       bascule('Faire défiler pour suivre le mot lu', st.suivre, function (on) { st.suivre = on; sauver(); }),
       st.lang === 'fr' ? h('div', { 'class': 'rang' }, btn('Colorer les syllabes de ce texte', 'syllabes', function () { S.syl.texte = st.texte; sauver(); aller('syllabes'); }, 'petit')) : null
@@ -2763,7 +2766,7 @@ function rProf() {
     h('p', { 'class': 'aide' }, 'Prépare un lien (et son QR code) pour ta classe : les élèves l’ouvrent et leur Dyspositif est pré-rempli. Ils n’ont rien à recopier.'),
     bloc('Emploi du temps de la classe', 'edt', 'Pour que chaque élève prépare son sac sans rien saisir.', edt),
     bloc('Un texte à écouter', 'txt', 'Il s’ouvrira dans le Lecteur, prêt à être écouté.', [
-      h('div', { 'class': 'rang' }, choix([['fr', 'Français'], ['en', 'English']], P.txt.l, function (l) { P.txt.l = l; sauver(); })),
+      h('div', { 'class': 'rang' }, choix([['fr', 'Français'], ['en', 'English'], ['es', 'Español']], P.txt.l, function (l) { P.txt.l = l; sauver(); })),
       champ(P.txt, 't', 'Colle le texte ici…', true)]),
     bloc('Une consigne', 'cons', 'Elle s’ouvrira dans le Décodeur de consignes.', champ(P.cons, 't', 'La consigne…', true)),
     bloc('Une tâche découpée en étapes', 'tache', 'Une étape par ligne. Elle s’ouvrira dans Étapes et dans « Je travaille ».', [
@@ -2788,7 +2791,7 @@ function appliquerImport(d) {
     }
     monter('sac');
   }
-  if (d.txt) { S.lecteur.texte = String(d.txt.t); S.lecteur.lang = d.txt.l === 'en' ? 'en' : 'fr'; monter('lecteur'); }
+  if (d.txt) { S.lecteur.texte = String(d.txt.t); S.lecteur.lang = (d.txt.l === 'en' || d.txt.l === 'es') ? d.txt.l : 'fr'; monter('lecteur'); }
   if (d.cons) { S.consigne = String(d.cons); monter('consignes'); }
   if (d.tache && d.tache.s && d.tache.s.length) {
     var t = { id: uid(), titre: String(d.tache.t), steps: d.tache.s.map(function (x) { return { t: String(x), f: false }; }), i: 0 };
@@ -2875,15 +2878,6 @@ function rAtelier() {
   });
   var grav = h('input', { type: 'text', maxlength: '18', value: S.prenom, placeholder: 'Ton prénom', 'aria-label': 'Gravure', oninput: function () { S.prenom = grav.value.trim(); sauver(); } });
   var conf = h('div'); controlesLecture(conf);
-  var fichier = h('input', { type: 'file', accept: '.json,application/json', hidden: true, onchange: function () {
-    var f = fichier.files[0]; if (!f) return;
-    var lr = new FileReader();
-    lr.onload = function () {
-      try { var d = JSON.parse(lr.result); if (!d || typeof d !== 'object' || d.v !== 1) throw new Error('format'); S = remplir(DEFAUT, d); sauver(); appliquerTheme(); toast('Sauvegarde importée.'); rAtelier(); }
-      catch (e) { toast('Ce fichier n’est pas une sauvegarde de Dyspositif.'); }
-    };
-    lr.readAsText(f);
-  } });
   var bEffacer = btn('Tout effacer', 'poubelle', function () {
     if (bEffacer._arme) { try { localStorage.removeItem(CLE); } catch (e) { } S = clone(DEFAUT); appliquerTheme(); toast('Tout a été effacé.'); aller(''); return; }
     bEffacer._arme = true; vider(bEffacer); ajoute(bEffacer, [ico('poubelle'), 'Sûr·e ? Touche encore pour effacer']);
@@ -2901,13 +2895,7 @@ function rAtelier() {
     h('p', { 'class': 'aide' }, 'Pour les enseignants : préparer un lien ou un QR code qui pré-remplit le Dyspositif des élèves (emploi du temps, texte, consigne, tâche, devoir, fiche).'),
     h('div', { 'class': 'rang' }, btn('Ouvrir l’espace prof', 'carte', function () { aller('prof'); })),
     h('div', { 'class': 'titre' }, 'Sauvegarde'),
-    h('p', { 'class': 'aide' }, 'Tout est enregistré sur cet appareil uniquement. Pour changer d’appareil, exporte une sauvegarde puis importe-la sur l’autre.'),
-    h('div', { 'class': 'rang' },
-      btn('Exporter ma sauvegarde', 'telecharger', function () {
-        var blob = new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' }), a = h('a', { href: URL.createObjectURL(blob), download: 'dyspositif-sauvegarde-' + isoJour(new Date()) + '.json' });
-        document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 500);
-      }),
-      btn('Importer une sauvegarde', 'ouvrir', function () { fichier.click(); }), fichier),
+    h('p', { 'class': 'aide' }, 'Tout est enregistré sur cet appareil. Pour garder ta progression ou la retrouver sur un autre appareil, touche le bouton 💾 en bas à gauche de l’écran : « Exporter ma progression » crée un fichier, « Importer une sauvegarde » le recharge.'),
     h('div', { 'class': 'rang', style: 'margin-top:20px' },
       btn('Refaire le montage', 'reprendre', function () { S.monte = false; sauver(); aller(''); }, 'petit'), bEffacer),
     h('p', { 'class': 'note', style: 'margin-top:24px' }, 'Dyspositif (Dys+) · by BROT2YOU — fonctionne sans compte et sans connexion une fois la page chargée (sauf certaines voix de lecture).')
