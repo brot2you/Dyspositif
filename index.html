@@ -574,6 +574,7 @@ var DEFAUT = {
   fiches: FICHES_DEF,
   meteo: [],
   carte: { prenom: '', classe: '', jai: '', aides: [], perso: [], difficile: '', decroche: '' },
+  volume: 0.7,
   stats: {}, collants: {}, journal: [], sacFaits: {}, fetes: true, lamesProf: [],
   focus: { actif: false, tache: '', label: '', duree: 15, faites: 0, compte: false },
   prof: { edt: { on: false, jours: { '1': [], '2': [], '3': [], '4': [], '5': [] } }, txt: { on: false, t: '', l: 'en' }, cons: { on: false, t: '' }, tache: { on: false, t: '', s: '' }, dev: { on: false, m: 'Anglais', q: '', p: '' }, fiche: { on: false, t: '', x: '' } }
@@ -619,29 +620,103 @@ function appliquerTheme() {
 /* =========================================================
    Sons (doux, désactivables)
    ========================================================= */
-var actx = null;
+var actx = null, sonBus = null;
+/* Petits sons de synthèse soignés : marimba, clochette, kalimba, « pop », avec réverbération légère.
+   Aucun fichier audio : tout est fabriqué dans le navigateur (Web Audio). */
 function audioPret() {
   try {
-    if (!actx) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; actx = new AC(); }
+    if (!actx) {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      actx = new AC();
+      sonBus = construireBus(actx, actx.destination);
+    }
     if (actx.state === 'suspended') actx.resume();
   } catch (e) { return null; }
   return actx;
 }
-function sonner(type) {
-  if (!S.sons) return;
-  var a = audioPret(); if (!a) return;
-  var notes = type === 'fin' ? [523.25, 659.25, 783.99, 1046.5] : (type === 'juste' ? [659.25, 987.77] : [587.33, 880]);
-  var t0 = a.currentTime + 0.02;
-  notes.forEach(function (f, i) {
-    var o = a.createOscillator(), g = a.createGain();
+function construireBus(c, sortie) {
+  var maitre = c.createGain(), comp = c.createDynamicsCompressor(), entree = c.createGain(), sec = c.createGain(), mouille = c.createGain(), rev = c.createConvolver();
+  comp.threshold.value = -16; comp.knee.value = 12; comp.ratio.value = 4; comp.attack.value = 0.003; comp.release.value = 0.2;
+  var duree = 1.8, n = Math.floor(c.sampleRate * duree), ir = c.createBuffer(2, n, c.sampleRate), ch, i, d;
+  for (ch = 0; ch < 2; ch++) { d = ir.getChannelData(ch); for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3.2); }
+  rev.buffer = ir;
+  sec.gain.value = 0.85; mouille.gain.value = 0.22;
+  entree.connect(sec); entree.connect(rev); rev.connect(mouille);
+  sec.connect(maitre); mouille.connect(maitre);
+  maitre.connect(comp); comp.connect(sortie);
+  maitre.gain.value = typeof S.volume === 'number' ? S.volume : 0.7;
+  return { entree: entree, maitre: maitre };
+}
+var TIMBRES = {
+  marimba: [[1, 1, 0.55], [3.99, 0.24, 0.09], [9.9, 0.05, 0.04]],
+  cloche: [[1, 0.7, 1.5], [2.76, 0.32, 0.8], [5.4, 0.16, 0.45], [8.93, 0.07, 0.25]],
+  kalimba: [[1, 1, 0.9], [5.95, 0.14, 0.12], [9.1, 0.04, 0.06]]
+};
+function note(c, bus, freq, t, timbre, vol, pan) {
+  var parts = TIMBRES[timbre] || TIMBRES.marimba, sortie = bus;
+  if (pan && c.createStereoPanner) { var p = c.createStereoPanner(); p.pan.value = pan; p.connect(bus); sortie = p; }
+  parts.forEach(function (pt) {
+    var o = c.createOscillator(), g = c.createGain(), f = freq * pt[0];
+    if (f > 16000) return;
     o.type = 'sine'; o.frequency.value = f;
-    g.gain.setValueAtTime(0.0001, t0 + i * 0.16);
-    g.gain.exponentialRampToValueAtTime(0.16, t0 + i * 0.16 + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.16 + 0.9);
-    o.connect(g); g.connect(a.destination);
-    o.start(t0 + i * 0.16); o.stop(t0 + i * 0.16 + 1);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol * pt[1]), t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + pt[2]);
+    o.connect(g); g.connect(sortie); o.start(t); o.stop(t + pt[2] + 0.05);
   });
 }
+function pop(c, bus, t, vol, haut) {
+  var o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+  o.type = 'triangle'; f.type = 'lowpass'; f.frequency.value = 3000;
+  o.frequency.setValueAtTime(haut ? 520 : 300, t);
+  o.frequency.exponentialRampToValueAtTime(haut ? 1300 : 820, t + 0.07);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+  o.connect(f); f.connect(g); g.connect(bus); o.start(t); o.stop(t + 0.2);
+}
+function scintille(c, bus, t, vol) {
+  var notes = [2093, 2637, 3136, 2349, 2794, 3520];
+  notes.forEach(function (fq, i) { note(c, bus, fq, t + i * 0.055 + Math.random() * 0.02, 'cloche', vol * (1 - i * 0.1), (i % 2 ? 0.4 : -0.4)); });
+}
+function souffleDoux(c, bus, t, monte, vol) {
+  var n = Math.floor(c.sampleRate * 1.2), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0), i;
+  for (i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+  var src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = b; f.type = 'bandpass'; f.Q.value = 1.2;
+  f.frequency.setValueAtTime(monte ? 350 : 900, t); f.frequency.exponentialRampToValueAtTime(monte ? 900 : 300, t + 1.1);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.4); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.15);
+  src.connect(f); f.connect(g); g.connect(bus); src.start(t); src.stop(t + 1.2);
+}
+var GAMME = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5, 1568, 1760];
+function jouerSon(c, bus, type, t, n) {
+  if (type === 'coche') { var k = Math.min(GAMME.length - 1, n || 0); pop(c, bus, t, 0.18, false); note(c, bus, GAMME[k], t + 0.02, 'marimba', 0.32); }
+  else if (type === 'etape') { pop(c, bus, t, 0.22, true); note(c, bus, 783.99, t + 0.03, 'marimba', 0.32); note(c, bus, 1046.5, t + 0.11, 'marimba', 0.32); }
+  else if (type === 'juste') { [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) { note(c, bus, f, t + i * 0.075, 'marimba', 0.3, (i - 1.5) * 0.2); }); note(c, bus, 2093, t + 0.34, 'cloche', 0.08); }
+  else if (type === 'fin') { note(c, bus, 523.25, t, 'kalimba', 0.32, -0.2); note(c, bus, 783.99, t + 0.22, 'kalimba', 0.3, 0.2); note(c, bus, 1318.5, t + 0.44, 'kalimba', 0.26, 0); note(c, bus, 1046.5, t + 0.44, 'cloche', 0.1, 0); }
+  else if (type === 'collant') {
+    pop(c, bus, t, 0.24, true);
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach(function (f, i) { note(c, bus, f, t + 0.05 + i * 0.065, 'marimba', 0.3, (i - 2) * 0.18); });
+    note(c, bus, 1046.5, t + 0.42, 'cloche', 0.16); note(c, bus, 1568, t + 0.42, 'cloche', 0.1);
+    scintille(c, bus, t + 0.5, 0.07);
+  }
+  else if (type === 'inspire') { souffleDoux(c, bus, t, true, 0.12); note(c, bus, 659.25, t, 'cloche', 0.2); }
+  else if (type === 'expire') { souffleDoux(c, bus, t, false, 0.12); note(c, bus, 493.88, t, 'cloche', 0.18); }
+  else { note(c, bus, 880, t, 'marimba', 0.3); }
+}
+function sonner(type, n) {
+  if (!S.sons) return;
+  var a = audioPret(); if (!a || !sonBus) return;
+  sonBus.maitre.gain.value = typeof S.volume === 'number' ? S.volume : 0.7;
+  jouerSon(a, sonBus.entree, type, a.currentTime + 0.02, n);
+}
+/* pour les tests : fabrique un son hors ligne */
+window.__b2yRendreSon = function (type, n) {
+  var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext, c = new OAC(2, 44100 * 2.6, 44100), bus = construireBus(c, c.destination);
+  bus.maitre.gain.value = 0.7; jouerSon(c, bus.entree, type, 0.02, n);
+  return c.startRendering().then(function (buf) { return [Array.prototype.slice.call(buf.getChannelData(0)), Array.prototype.slice.call(buf.getChannelData(1))]; });
+};
 
 /* =========================================================
    Synthèse vocale
@@ -1694,6 +1769,7 @@ function rSac(sh) {
       var cle = it.t.toLowerCase();
       var b = h('button', { 'class': 'ligne-coche' + (coches[cle] ? ' fait' : ''), type: 'button', 'aria-pressed': coches[cle] ? 'true' : 'false', onclick: function () {
         coches[cle] = !coches[cle]; sauver();
+        if (coches[cle]) sonner('coche', items.filter(function (x) { return coches[x.t.toLowerCase()]; }).length - 1);
         b.className = 'ligne-coche' + (coches[cle] ? ' fait' : ''); b.setAttribute('aria-pressed', coches[cle] ? 'true' : 'false');
         majC(); if (coches[cle]) { var tous = items.every(function (x) { return coches[x.t.toLowerCase()]; }); if (tous) { sonner('juste'); confettis(); if (!S.sacFaits[iso]) { S.sacFaits[iso] = 1; compter('sacs'); } } }
       } }, h('span', { 'class': 'case' }, ico('coche')), h('span', { 'class': 'pastille', style: 'background:' + it.c }), h('span', { 'class': 'txt' }, it.t));
@@ -2176,9 +2252,9 @@ function rPause(sh) {
     function cycle(i) {
       if (i >= 6) { finir(zone); return; }
       info.textContent = 'Respiration ' + (i + 1) + ' sur 6';
-      bulle.style.transitionDuration = '4s'; bulle.textContent = 'Inspire…'; bulle.style.transform = 'scale(1)';
+      bulle.style.transitionDuration = '4s'; bulle.textContent = 'Inspire…'; bulle.style.transform = 'scale(1)'; sonner('inspire');
       plus(function () {
-        bulle.style.transitionDuration = '6s'; bulle.textContent = 'Souffle…'; bulle.style.transform = 'scale(.62)';
+        bulle.style.transitionDuration = '6s'; bulle.textContent = 'Souffle…'; bulle.style.transform = 'scale(.62)'; sonner('expire');
         plus(function () { cycle(i + 1); }, 6000);
       }, 4000);
     }
@@ -2372,7 +2448,7 @@ function confettis() {
 function montrerFete() {
   var a = fileFetes.shift();
   if (!a) { feteOuverte = false; return; }
-  feteOuverte = true; sonner('fin'); confettis();
+  feteOuverte = true; sonner('collant'); confettis();
   var f = h('div', { 'class': 'fete', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Nouvel autocollant' });
   var carte = h('div', { 'class': 'fete-carte' },
     h('div', { 'class': 'fete-titre' }, 'Nouvel autocollant !'),
@@ -2542,7 +2618,7 @@ function rFocus() {
     Chrono.surFin = null; Chrono.vue = null; Chrono.reinit();
     compterSeance();
     F.actif = false; sauver(); garderEcran(false);
-    vider(sh); confettis(); sonner('fin');
+    vider(sh); confettis(); sonner('juste');
     ajoute(sh, h('div', { 'class': 'focus' },
       h('div', { 'class': 'compteur' }, 'Séance terminée'),
       h('div', { 'class': 'etape-txt lisible' }, F.faites ? 'Bravo ! ' + F.faites + ' étape' + (F.faites > 1 ? 's' : '') + ' faite' + (F.faites > 1 ? 's' : '') + ' pendant cette séance.' : 'Bravo, tu es allé·e au bout de ta séance !'),
@@ -2915,7 +2991,14 @@ function rAtelier() {
     h('div', { 'class': 'titre' }, 'Couleur du manche'), manches,
     h('div', { 'class': 'titre' }, 'Gravure'), grav,
     h('div', { 'class': 'titre' }, 'Confort de lecture'), conf,
-    h('div', { 'class': 'titre' }, 'Sons'), bascule('Petits sons (fin du sablier, étape faite)', S.sons, function (on) { S.sons = on; sauver(); }),
+    h('div', { 'class': 'titre' }, 'Sons'), bascule('Petits sons (étape faite, sac prêt, fin du sablier, autocollant…)', S.sons, function (on) { S.sons = on; sauver(); }),
+    h('label', { 'class': 'lab' }, 'Volume'),
+    (function () { var r = h('input', { type: 'range', min: '0.1', max: '1', step: '0.05', value: S.volume, 'aria-label': 'Volume des sons', onchange: function () { S.volume = parseFloat(r.value); sauver(); sonner('etape'); } }); return r; })(),
+    h('div', { 'class': 'echelle' }, h('span', null, 'doux'), h('span', null, 'fort')),
+    h('div', { 'class': 'rang' },
+      btn('Étape', 'lire', function () { sonner('etape'); }, 'petit'), btn('Bravo', 'lire', function () { sonner('juste'); }, 'petit'),
+      btn('Fin du sablier', 'lire', function () { sonner('fin'); }, 'petit'), btn('Autocollant', 'lire', function () { sonner('collant'); }, 'petit')),
+    h('p', { 'class': 'note' }, 'Sur iPhone et iPad, les sons sont coupés quand le bouton silencieux (sur le côté) est activé.'),
     h('div', { 'class': 'titre' }, 'Fêtes'), bascule('Confettis quand je gagne un autocollant ou que je finis quelque chose', S.fetes, function (on) { S.fetes = on; sauver(); }),
     h('div', { 'class': 'titre' }, 'Espace prof'),
     h('p', { 'class': 'aide' }, 'Pour les enseignants : préparer un lien ou un QR code qui pré-remplit le Dyspositif des élèves (emploi du temps, texte, consigne, tâche, devoir, fiche).'),
