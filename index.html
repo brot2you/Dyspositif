@@ -318,6 +318,41 @@ table.pyth{border-collapse:separate;border-spacing:3px;margin:8px 0;font-variant
   .pyth th,.pyth td{width:30px;height:34px;font-size:14px}
   .info{flex:1 1 100%}
 }
+
+/* autocollants, fêtes */
+.confettis{position:fixed;inset:0;pointer-events:none;z-index:70;overflow:hidden}
+.confettis i{position:absolute;top:-24px;width:11px;height:16px;border:2px solid var(--ink);animation-name:tombe;animation-timing-function:cubic-bezier(.3,.6,.6,1);animation-fill-mode:forwards}
+@keyframes tombe{to{top:106%;transform:translateX(50px) rotate(640deg)}}
+.fete{position:fixed;inset:0;z-index:65;background:rgba(29,27,46,.55);display:flex;align-items:center;justify-content:center;padding:20px}
+.fete-carte{background:#FFFDF8;border:4px solid var(--ink);border-radius:28px;box-shadow:8px 8px 0 var(--ink);padding:26px 30px;text-align:center;max-width:390px;width:100%;animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.fete-titre{font-family:var(--titre);font-weight:600;font-size:20px;color:var(--ink2)}
+.fete-collant svg{width:150px;height:150px;margin:8px 0;animation:tourne .9s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes tourne{from{transform:scale(.2) rotate(-120deg)}to{transform:none}}
+.fete-nom{font-family:var(--titre);font-weight:700;font-size:30px;line-height:1.1}
+.collants{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;background:#fff;border:3px solid var(--ink);border-radius:22px;padding:14px;box-shadow:var(--ombre)}
+.collant{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;border-radius:14px}
+.collant:hover{background:#FFF4E2}
+.collant svg{width:64px;height:64px}
+.collant:not(.verrou) svg{filter:drop-shadow(2px 2px 0 rgba(29,27,46,.25))}
+.collant small{font-size:12.5px;font-weight:600;text-align:center;line-height:1.2}
+.collant.verrou small{color:#A8987A}
+.compte{display:inline-block;font-family:'Lexend',sans-serif;font-size:15px;font-weight:600;padding:2px 12px;border:2.5px solid var(--ink);border-radius:999px;background:#fff;margin-left:10px;vertical-align:middle}
+.info.bilan{background:#FFFBEA}
+.pied{text-align:center;margin-top:34px}
+.lien{background:none;border:none;text-decoration:underline;text-underline-offset:4px;color:var(--ink2);font-size:15px;padding:8px}
+/* je travaille */
+.focus-zone{text-align:center}
+.focus-top{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+.focus-ctrl{display:flex;flex-direction:column;gap:10px}
+.anneau{width:150px;height:150px}
+.choix-tache{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px 16px;border:2.5px solid var(--ink);border-radius:16px;background:#fff;margin:8px 0;font-size:17px;font-family:var(--rf)}
+.choix-tache small{color:var(--ink2)}
+.choix-tache.on{background:var(--t);box-shadow:3px 3px 0 var(--ink)}
+.choix-tache.on .case{color:var(--ink)}
+/* espace prof */
+.qr{margin-top:14px}
+.qr svg{width:min(300px,80vw);height:auto;border:3px solid var(--ink);border-radius:18px;padding:6px;background:#fff;box-shadow:var(--ombre)}
+@media (max-width:640px){.collants{grid-template-columns:repeat(auto-fill,minmax(78px,1fr))}.collant svg{width:54px;height:54px}}
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
@@ -513,7 +548,10 @@ var DEFAUT = {
   op: '',
   fiches: FICHES_DEF,
   meteo: [],
-  carte: { prenom: '', classe: '', jai: '', aides: [], perso: [], difficile: '', decroche: '' }
+  carte: { prenom: '', classe: '', jai: '', aides: [], perso: [], difficile: '', decroche: '' },
+  stats: {}, collants: {}, journal: [], sacFaits: {}, fetes: true, lamesProf: [],
+  focus: { actif: false, tache: '', label: '', duree: 15, faites: 0, compte: false },
+  prof: { edt: { on: false, jours: { '1': [], '2': [], '3': [], '4': [], '5': [] } }, txt: { on: false, t: '', l: 'en' }, cons: { on: false, t: '' }, tache: { on: false, t: '', s: '' }, dev: { on: false, m: 'Anglais', q: '', p: '' }, fiche: { on: false, t: '', x: '' } }
 };
 var S;
 (function charger() {
@@ -676,11 +714,14 @@ var OUTILS = [
 ];
 function outil(id) { return trouve(OUTILS, function (o) { return o.id === id; }); }
 var outilCourant = null, outilPrecedent = null, nettoyages = [];
-function quitter() { TTS.stop(); TTS.surChange = null; Chrono.vue = null; for (var i = 0; i < nettoyages.length; i++) { try { nettoyages[i](); } catch (e) { } } nettoyages = []; fermerAa(); }
+function quitter() { TTS.stop(); TTS.surChange = null; Chrono.vue = null; Chrono.surFin = null; garderEcran(false); for (var i = 0; i < nettoyages.length; i++) { try { nettoyages[i](); } catch (e) { } } nettoyages = []; fermerAa(); }
 function aller(id) { if (location.hash.replace('#', '') === id) route(); else location.hash = id; }
 function route() {
   var id = location.hash.replace('#', '');
-  if (id === 'atelier') rAtelier();
+  if (id.indexOf('import=') === 0) rImport(id.slice(7));
+  else if (id === 'prof') rProf();
+  else if (id === 'atelier') rAtelier();
+  else if (id === 'focus' && S.monte) rFocus();
   else if (outil(id) && S.monte) ouvrir(id);
   else accueil();
 }
@@ -740,6 +781,8 @@ function couteauSVG(ids) {
   s += '<circle cx="110" cy="169" r="10" fill="#fff" stroke="#1D1B2E" stroke-width="3.5"/><circle cx="276" cy="169" r="7" fill="#fff" stroke="#1D1B2E" stroke-width="3"/>';
   var nom = (S.prenom || 'Dys+').slice(0, 14).replace(/[<>&"]/g, '');
   s += '<text x="194" y="177" text-anchor="middle" font-family="Fredoka,Lexend,sans-serif" font-weight="700" font-size="21" fill="' + coul.t + '">' + nom + '</text>';
+  var gagnes = AUTOCOLLANTS.filter(function (a) { return !!S.collants[a.id]; }).sort(function (x, y) { return S.collants[x.id] < S.collants[y.id] ? 1 : -1; }).slice(0, 4), px = [124, 162, 226, 264];
+  gagnes.forEach(function (a, i) { s += '<g transform="translate(' + (px[i] - 19) + ',176) scale(.64) rotate(' + (i % 2 ? 9 : -9) + ' 30 30)">' + corpsCollant(a) + '</g>'; });
   s += '</svg>';
   return s;
 }
@@ -777,12 +820,14 @@ function accueil() {
     h('div', null,
       h('h1', null, salut + (S.prenom ? ' ' + S.prenom : '') + ' !'),
       h('p', null, 'Quel outil on sort aujourd’hui ?'),
-      h('span', { 'class': 'date' }, libDate(new Date()).replace(/^./, function (c) { return c.toUpperCase(); }))),
+      h('span', { 'class': 'date' }, libDate(new Date()).replace(/^./, function (c) { return c.toUpperCase(); })),
+      h('div', { 'class': 'rang', style: 'margin-top:18px' }, btn(S.focus.actif ? 'Reprendre mon travail' : 'Je me mets au travail', 'lire', function () { aller('focus'); }, 'prim gros', { style: '--t:#A6DDF7' }))),
     h('div', { html: couteauSVG(lames) }));
   var page = h('div', { 'class': 'accueil' }, hero);
-  var infos = infosDuJour();
-  if (infos.length) {
+  var infos = infosDuJour(), bilan = bilanSemaine();
+  if (infos.length || bilan.length) {
     var z = h('div', { 'class': 'aujourdhui' });
+    if (bilan.length) z.appendChild(h('div', { 'class': 'info bilan' }, h('span', { 'class': 'pas', style: 'background:#FFE38F' }, ico('coche')), h('span', null, h('b', null, 'Cette semaine'), h('small', null, bilan.slice(0, 3).join(' · ')))));
     infos.forEach(function (x) {
       var o = outil(x.id);
       z.appendChild(h('button', { 'class': 'info', type: 'button', onclick: function () { aller(x.id); } },
@@ -803,6 +848,7 @@ function accueil() {
       h('span', { 'class': 'fleche' }, ico('retour'))));
   });
   page.appendChild(g);
+  ajoute(page, collection());
   var reste = OUTILS.filter(function (o) { return lames.indexOf(o.id) < 0; });
   if (reste.length) {
     var p = h('div', { 'class': 'puces' });
@@ -810,6 +856,7 @@ function accueil() {
     page.appendChild(h('div', { 'class': 'section-titre' }, 'Encore dans la boîte'));
     page.appendChild(p);
   }
+  page.appendChild(h('p', { 'class': 'pied' }, h('button', { 'class': 'lien', type: 'button', onclick: function () { aller('prof'); } }, 'Espace prof : préparer un lien ou un QR code pour la classe')));
   v.appendChild(page);
   setTimeout(function () {
     var gs = v.querySelectorAll('.lsvg');
@@ -835,6 +882,7 @@ function montage() {
   var bMonter = btn('C’est parti !', 'coche', function () {
     var ids = [];
     choisis.forEach(function (i) { PACKS[i].l.forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); }); });
+    S.lamesProf.forEach(function (id) { if (ids.indexOf(id) < 0) ids.push(id); });
     S.lames = OUTILS.map(function (o) { return o.id; }).filter(function (id) { return ids.indexOf(id) >= 0; });
     S.prenom = nom.value.trim(); S.carte.prenom = S.carte.prenom || S.prenom;
     S.monte = true; sauver(); aller('');
@@ -976,7 +1024,7 @@ function rLecteur(sh) {
     ]);
   }
   function lire() {
-    var txt = st.texte, segs = phrases(txt), joue = false, cur = 0, dernierePos = null, motOn = null, phrOn = [];
+    var dejaCompte = false, txt = st.texte, segs = phrases(txt), joue = false, cur = 0, dernierePos = null, motOn = null, phrOn = [];
     var zone = h('div', { 'class': 'zone lisible', 'aria-live': 'off' });
     var spans = texteAvecMots(zone, txt, function (sp) { jouer(sp._s); });
     var rg = regle(zone);
@@ -1006,6 +1054,7 @@ function rLecteur(sh) {
     }
     function jouer(depuis) {
       if (!TTS.ok) return;
+      if (!dejaCompte) { dejaCompte = true; compter('lectures'); }
       TTS.stop(); var j = TTS.jeton; joue = true; majBoutons();
       var i = 0;
       if (depuis !== null && depuis !== undefined) { i = indexDe(segs, function (s) { return depuis >= s.s && depuis < s.e; }); if (i < 0) i = 0; }
@@ -1273,10 +1322,11 @@ function carteVerbe(vb, num) {
 function rConsignes(sh) {
   var ta = h('textarea', { 'class': 'lisible', rows: '4', placeholder: 'Colle ou écris la consigne ici…', value: S.consigne, 'aria-label': 'Consigne', oninput: function () { S.consigne = ta.value; sauver(); } });
   var res = h('div');
-  function decoder() {
+  function decoder(compte) {
     vider(res);
     var txt = ta.value.trim(); if (!txt) { ta.focus(); return; }
     var an = analyserConsigne(txt), ind = indicesConsigne(txt);
+    if (compte === true && an.actions.length) compter('consignes');
     var z = h('div', { 'class': 'zone lisible', style: 'margin-top:16px' }), dernier = 0;
     an.tous.forEach(function (o) {
       z.appendChild(document.createTextNode(txt.slice(dernier, o.s)));
@@ -1319,9 +1369,9 @@ function rConsignes(sh) {
     h('p', { 'class': 'aide' }, 'Colle la consigne : je repère ce qu’on te demande de faire et je t’explique comment t’y prendre.'),
     ta,
     h('div', { 'class': 'rang' },
-      btn('Décoder', 'consignes', decoder, 'prim gros'),
+      btn('Décoder', 'consignes', function () { decoder(true); }, 'prim gros'),
       btn('Écouter', 'lecteur', function () { if (ta.value.trim()) TTS.dire(ta.value, 'fr'); }),
-      btn('Exemple', null, function () { ta.value = 'Relevez deux indices qui montrent que le personnage a peur, puis expliquez pourquoi il refuse d’entrer. Justifiez votre réponse avec le texte.'; S.consigne = ta.value; sauver(); decoder(); })),
+      btn('Exemple', null, function () { ta.value = 'Relevez deux indices qui montrent que le personnage a peur, puis expliquez pourquoi il refuse d’entrer. Justifiez votre réponse avec le texte.'; S.consigne = ta.value; sauver(); decoder(true); })),
     res,
     h('div', { 'class': 'titre', style: 'margin-top:30px' }, 'Tous les verbes de consigne'),
     h('p', { 'class': 'aide' }, 'Ouvre une famille, puis touche un verbe pour voir ce qu’il veut dire.'),
@@ -1416,10 +1466,12 @@ function rEtapes(sh) {
         btn('C’est fait', 'coche', function () {
           s.f = true; sonner('etape');
           var k = indexDe(t.steps, function (x) { return !x.f; });
-          t.i = k < 0 ? t.steps.length : k; sauver();
+          t.i = k < 0 ? t.steps.length : k; sauver(); compter('etapes');
+          if (k < 0) { compter('taches'); confettis(); }
           vue = k < 0 ? 'fini' : 'focus'; dessiner();
         }, 'prim gros')),
       h('div', { 'class': 'rang', style: 'justify-content:center;margin-top:18px' },
+        btn('Mode « Je travaille »', 'lire', function () { S.focus.tache = t.id; S.focus.actif = false; sauver(); aller('focus'); }, 'petit'),
         btn('Écouter', 'lecteur', function () { TTS.dire(s.t, 'fr'); }, 'petit'),
         btn('Sablier 10 min', 'sablier', function () { Chrono.regler(10); Chrono.demarrer(); toast('Sablier lancé : 10 minutes.'); }, 'petit'),
         btn('Étape précédente', 'retour', function () { if (t.i > 0) { t.i--; t.steps[t.i].f = false; sauver(); dessiner(); } }, 'petit', { disabled: t.i === 0 }),
@@ -1465,8 +1517,12 @@ var Chrono = {
     this.dureeMs = this.resteMs = m * 60000; this.sonne = false; this.maj();
   },
   tic: function () { this.resteMs = Math.max(0, this.fin - Date.now()); if (this.resteMs <= 0) this.terminer(); this.maj(); },
+  surFin: null,
   terminer: function () {
     clearInterval(this.iv); this.marche = false; this.resteMs = 0; sonner('fin');
+    var fini = this.phase;
+    if (fini === 'travail') compter('sabliers');
+    if (this.surFin) { this.sonne = true; this.maj(); this.surFin(fini); return; }
     if (S.sablier.cycle) {
       this.phase = this.phase === 'travail' ? 'repos' : 'travail';
       var m = this.phase === 'travail' ? S.sablier.travail : S.sablier.repos;
@@ -1481,7 +1537,7 @@ var Chrono = {
 function mmss(ms) { var s = Math.ceil(ms / 1000), m = Math.floor(s / 60); return pad2(m) + ':' + pad2(s % 60); }
 function majPuceChrono() {
   if (!puceChrono) return;
-  var a = Chrono.actif() && outilCourant !== 'sablier';
+  var a = Chrono.actif() && outilCourant !== 'sablier' && outilCourant !== 'focus';
   puceChrono.hidden = !a;
   if (a) puceChrono.textContent = (Chrono.marche ? '' : '❚❚ ') + mmss(Chrono.resteMs);
 }
@@ -1612,7 +1668,7 @@ function rSac(sh) {
       var b = h('button', { 'class': 'ligne-coche' + (coches[cle] ? ' fait' : ''), type: 'button', 'aria-pressed': coches[cle] ? 'true' : 'false', onclick: function () {
         coches[cle] = !coches[cle]; sauver();
         b.className = 'ligne-coche' + (coches[cle] ? ' fait' : ''); b.setAttribute('aria-pressed', coches[cle] ? 'true' : 'false');
-        majC(); if (coches[cle]) { var tous = items.every(function (x) { return coches[x.t.toLowerCase()]; }); if (tous) sonner('juste'); }
+        majC(); if (coches[cle]) { var tous = items.every(function (x) { return coches[x.t.toLowerCase()]; }); if (tous) { sonner('juste'); confettis(); if (!S.sacFaits[iso]) { S.sacFaits[iso] = 1; compter('sacs'); } } }
       } }, h('span', { 'class': 'case' }, ico('coche')), h('span', { 'class': 'pastille', style: 'background:' + it.c }), h('span', { 'class': 'txt' }, it.t));
       cont.appendChild(b);
     });
@@ -1704,7 +1760,7 @@ function rDevoirs(sh) {
   }
   function ligne(d) {
     var m = nomMat(d.mat);
-    var coche = h('button', { 'class': 'ligne-coche' + (d.fait ? ' fait' : ''), type: 'button', style: 'margin:0;border:none;padding:0;background:none', 'aria-label': d.fait ? 'Marquer comme non fait' : 'Marquer comme fait', onclick: function () { d.fait = !d.fait; if (d.fait) sonner('etape'); sauver(); dessiner(); } }, h('span', { 'class': 'case' }, ico('coche')));
+    var coche = h('button', { 'class': 'ligne-coche' + (d.fait ? ' fait' : ''), type: 'button', style: 'margin:0;border:none;padding:0;background:none', 'aria-label': d.fait ? 'Marquer comme non fait' : 'Marquer comme fait', onclick: function () { d.fait = !d.fait; sauver(); if (d.fait) { sonner('etape'); compter('devoirs'); } dessiner(); } }, h('span', { 'class': 'case' }, ico('coche')));
     return h('div', { 'class': 'carte-item', style: 'border-left:8px solid ' + m.c + ';display:flex;gap:14px;align-items:flex-start' + (d.fait ? ';opacity:.55' : '') },
       coche,
       h('div', { style: 'flex:1;min-width:0' },
@@ -1806,7 +1862,7 @@ function rMots(sh) {
     ajoute(cont, [c1, c2, c3, c4, h('div', { 'class': 'rang', style: 'margin-top:18px' }, btn(edite ? 'Enregistrer' : 'Ajouter le mot', 'coche', function () {
       var mot = c1[1].value.trim(); if (!mot) { c1[1].focus(); return; }
       w.mot = mot; w.erreur = c2[1].value.trim(); w.astuce = c3[1].value.trim(); w.ex = c4[1].value.trim();
-      if (!edite) { w.id = uid(); S.mots.push(w); }
+      if (!edite) { w.id = uid(); S.mots.push(w); compter('mots'); }
       sauver(); toast(edite ? 'Mot modifié.' : 'Mot ajouté.'); edite = null; onglet = 'liste'; dessiner();
     }, 'prim gros'))]);
     c1[1].focus();
@@ -1830,7 +1886,7 @@ function rMots(sh) {
       function verifier() {
         var e = inp.value.trim(); if (!e) return;
         vider(retour);
-        if (e === w.mot) { justes++; sonner('juste'); retour.appendChild(h('div', { 'class': 'alerte', style: 'background:#DDF0DB;border-color:#3E8E41' }, 'Juste !')); }
+        if (e === w.mot) { justes++; sonner('juste'); compter('motsJustes'); retour.appendChild(h('div', { 'class': 'alerte', style: 'background:#DDF0DB;border-color:#3E8E41' }, 'Juste !')); }
         else {
           var mk = lcsMarques(w.mot, e), bon = h('span', { 'class': 'lisible', style: 'font-size:calc(var(--rs) * 1.3);font-weight:700' }), mien = h('span', { 'class': 'lisible', style: 'font-size:calc(var(--rs) * 1.3)' }), k;
           for (k = 0; k < w.mot.length; k++) bon.appendChild(mk.a[k] ? document.createTextNode(w.mot.charAt(k)) : h('span', { style: 'background:#F2B33D;border-radius:3px;padding:0 2px' }, w.mot.charAt(k)));
@@ -1960,7 +2016,7 @@ function rOperations(sh) {
     courant.partiels.forEach(function (p, i) { err += verifierLigne(courant.lignesPart[i], p.val, p.dec); });
     err += verifierLigne(courant.ligneRes, courant.res, 0);
     var ancien = msg.querySelector('.resultat'); if (ancien) ancien.parentNode.removeChild(ancien);
-    if (!err) sonner('juste');
+    if (!err) { sonner('juste'); confettis(); if (!courant.compte) { courant.compte = true; compter('ops'); } }
     msg.insertBefore(h('div', { 'class': 'alerte resultat', style: err ? '' : 'background:#DDF0DB;border-color:#3E8E41' }, err ? err + ' case' + (err > 1 ? 's' : '') + ' à revoir (en orange). Les cases vertes sont justes.' : 'Bravo, tout est juste !'), msg.firstChild);
   }
   ajoute(actions, [btn('Vérifier', 'coche', verifier, 'prim'), btn('Effacer mes réponses', 'poubelle', function () {
@@ -2078,8 +2134,9 @@ function rPause(sh) {
     if (mode === 'respirer') respirer(); else bouger();
   }
   function finir(zone) {
-    vider(zone);
+    vider(zone); compter('pauses');
     var prec = outilPrecedent && outilPrecedent !== 'pause' ? outil(outilPrecedent) : null;
+    if (outilPrecedent === 'focus') prec = { id: 'focus', nom: 'mon travail' };
     ajoute(zone, [h('div', { 'class': 'etape-txt', style: 'text-align:center' }, 'Bien joué. Prêt·e à reprendre ?'),
       h('div', { 'class': 'rang', style: 'justify-content:center' },
         prec ? btn('Retourner à : ' + prec.nom, 'retour', function () { aller(prec.id); }, 'prim gros') : btn('Revenir au couteau', 'retour', function () { aller(''); }, 'prim gros'),
@@ -2130,7 +2187,7 @@ function rMeteo(sh) {
   METEOS.forEach(function (m) {
     var b = h('button', { 'class': 'meteo-btn', type: 'button', onclick: function () {
       choisi = m; var bs = g.querySelectorAll('button'); for (var k = 0; k < bs.length; k++) bs[k].className = 'meteo-btn'; b.className = 'meteo-btn on';
-      S.meteo.push({ d: new Date().toISOString(), s: m.id }); if (S.meteo.length > 30) S.meteo.shift(); sauver();
+      S.meteo.push({ d: new Date().toISOString(), s: m.id }); if (S.meteo.length > 30) S.meteo.shift(); sauver(); compter('meteo');
       reponse(); releves();
     } }, h('span', { html: svgMeteo(m) }), m.nom);
     g.appendChild(b);
@@ -2187,6 +2244,7 @@ function montrerCarte() {
       corps)
   ]);
   p.hidden = false; p.scrollTop = 0;
+  compter('carte');
 }
 function rCarte(sh) {
   var C = S.carte;
@@ -2224,6 +2282,561 @@ function rCarte(sh) {
     champ('Ce qui est difficile pour moi', 'difficile', 'Exemple : copier vite au tableau, les textes très longs.', true),
     champ('Si je décroche, vous pouvez…', 'decroche', 'Exemple : me faire un petit signe, sans m’interpeller devant tout le monde.', true),
     h('div', { 'class': 'rang', style: 'margin-top:18px' }, btn('Montrer ma carte', 'carte', montrerCarte, 'prim'))
+  ]);
+}
+
+/* =========================================================
+   Autocollants, fêtes et bilan de la semaine
+   (tout reste dans l'appli : aucun privilège à honorer en classe)
+   ========================================================= */
+var AUTOCOLLANTS = [
+  { id: 'sac1', k: 'sacs', n: 1, nom: 'Sac bouclé', d: 'Préparer son sac en entier une première fois', c: '#C3A6FF', ic: 'sac' },
+  { id: 'sac10', k: 'sacs', n: 10, nom: 'Jamais sans mon sac', d: 'Préparer son sac en entier 10 fois', c: '#9B7BF0', ic: 'sac' },
+  { id: 'cons1', k: 'consignes', n: 1, nom: 'Décodeur', d: 'Décoder une première consigne', c: '#7CC8FF', ic: 'consignes' },
+  { id: 'cons10', k: 'consignes', n: 10, nom: 'Expert des consignes', d: 'Décoder 10 consignes', c: '#4AA8F0', ic: 'consignes' },
+  { id: 'tache1', k: 'taches', n: 1, nom: 'Jusqu’au bout', d: 'Finir une tâche, toutes les étapes', c: '#8EDB8E', ic: 'etapes' },
+  { id: 'tache5', k: 'taches', n: 5, nom: 'Machine à étapes', d: 'Finir 5 tâches', c: '#5BC45B', ic: 'etapes' },
+  { id: 'etape25', k: 'etapes', n: 25, nom: 'Pas à pas', d: 'Cocher 25 étapes', c: '#B8E36E', ic: 'coche' },
+  { id: 'focus1', k: 'focus', n: 1, nom: 'Dans la zone', d: 'Terminer une séance « Je travaille »', c: '#A6DDF7', ic: 'lire' },
+  { id: 'focus10', k: 'focus', n: 10, nom: 'Concentration XXL', d: 'Terminer 10 séances « Je travaille »', c: '#6EC3EE', ic: 'lire' },
+  { id: 'chrono3', k: 'sabliers', n: 3, nom: 'Maître du temps', d: 'Aller 3 fois au bout du sablier', c: '#FF8A7A', ic: 'sablier' },
+  { id: 'pause3', k: 'pauses', n: 3, nom: 'Zen', d: 'Prendre 3 pauses jusqu’au bout', c: '#9FD8F2', ic: 'pause' },
+  { id: 'dev5', k: 'devoirs', n: 5, nom: 'Devoirs faits', d: 'Cocher 5 devoirs comme faits', c: '#B8E36E', ic: 'devoirs' },
+  { id: 'mots5', k: 'mots', n: 5, nom: 'Chasseur de pièges', d: 'Ajouter 5 mots pièges', c: '#FFD84D', ic: 'mots' },
+  { id: 'juste10', k: 'motsJustes', n: 10, nom: 'Œil de lynx', d: 'Écrire juste 10 mots à l’entraînement', c: '#F5C02E', ic: 'oeil' },
+  { id: 'ops5', k: 'ops', n: 5, nom: 'Calcul posé', d: 'Réussir 5 opérations posées', c: '#5ED3C6', ic: 'operations' },
+  { id: 'lect5', k: 'lectures', n: 5, nom: 'Bonne écoute', d: 'Écouter 5 textes avec le Lecteur', c: '#FFB547', ic: 'lecteur' },
+  { id: 'meteo5', k: 'meteo', n: 5, nom: 'Météorologue', d: 'Faire 5 relevés météo', c: '#FFE38F', ic: 'meteo' },
+  { id: 'carte1', k: 'carte', n: 1, nom: 'Je m’explique', d: 'Montrer sa carte de besoins', c: '#F5A9D6', ic: 'carte' }
+];
+var fileFetes = [], feteOuverte = false;
+function compter(k) {
+  S.stats[k] = (S.stats[k] || 0) + 1;
+  S.journal.push({ d: isoJour(new Date()), k: k });
+  var limite = isoJour(plusJours(aujourdhui(), -70));
+  while (S.journal.length && S.journal[0].d < limite) S.journal.shift();
+  AUTOCOLLANTS.forEach(function (a) {
+    if (!S.collants[a.id] && (S.stats[a.k] || 0) >= a.n) { S.collants[a.id] = new Date().toISOString(); fileFetes.push(a); }
+  });
+  sauver();
+  if (fileFetes.length && !feteOuverte) { feteOuverte = true; setTimeout(montrerFete, 450); }
+}
+function minusc(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
+function svgCollant(a, gagne) {
+  if (!gagne) return '<svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="26" fill="#F3EADB" stroke="#B9A98A" stroke-width="3" stroke-dasharray="6 5"/><text x="30" y="38" text-anchor="middle" font-family="Fredoka,Lexend,sans-serif" font-weight="700" font-size="22" fill="#B9A98A">?</text></svg>';
+  return '<svg viewBox="0 0 60 60" aria-hidden="true">' + corpsCollant(a) + '</svg>';
+}
+function corpsCollant(a) {
+  return '<circle cx="30" cy="30" r="26" fill="' + a.c + '" stroke="#1D1B2E" stroke-width="3"/><circle cx="30" cy="30" r="17" fill="#fff" stroke="#1D1B2E" stroke-width="2.5"/>' +
+    '<g transform="translate(19.5,19.5) scale(.875)" fill="none" stroke="#1D1B2E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' + ICONES[a.ic] + '</g>';
+}
+function confettis() {
+  if (!S.fetes) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var cols = ['#FFB547', '#FF9EB5', '#7CC8FF', '#8EDB8E', '#FFD84D', '#C3A6FF', '#5ED3C6'], z = h('div', { 'class': 'confettis', 'aria-hidden': 'true' }), i;
+  for (i = 0; i < 46; i++) {
+    z.appendChild(h('i', { style: 'left:' + (Math.random() * 100).toFixed(1) + '%;background:' + cols[i % cols.length] + ';animation-delay:' + (Math.random() * 0.35).toFixed(2) + 's;animation-duration:' + (1.3 + Math.random() * 0.9).toFixed(2) + 's' + (i % 3 === 0 ? ';border-radius:50%' : '') }));
+  }
+  document.body.appendChild(z);
+  setTimeout(function () { if (z.parentNode) z.parentNode.removeChild(z); }, 2600);
+}
+function montrerFete() {
+  var a = fileFetes.shift();
+  if (!a) { feteOuverte = false; return; }
+  feteOuverte = true; sonner('fin'); confettis();
+  var f = h('div', { 'class': 'fete', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Nouvel autocollant' });
+  var carte = h('div', { 'class': 'fete-carte' },
+    h('div', { 'class': 'fete-titre' }, 'Nouvel autocollant !'),
+    h('div', { 'class': 'fete-collant', html: svgCollant(a, true) }),
+    h('div', { 'class': 'fete-nom' }, a.nom),
+    h('div', { 'class': 'aide', style: 'margin:6px 0 4px' }, a.d + '.'),
+    h('div', { 'class': 'aide', style: 'margin:0 0 18px' }, 'Il est collé sur ton couteau, à l’accueil.'),
+    btn('Trop bien !', 'coche', function () {
+      if (f.parentNode) f.parentNode.removeChild(f);
+      if (fileFetes.length) setTimeout(montrerFete, 250); else feteOuverte = false;
+    }, 'prim gros', { style: '--t:' + a.c }));
+  f.appendChild(carte); document.body.appendChild(f);
+  var b = carte.querySelector('button'); if (b) b.focus();
+}
+function debutSemaine() { var d = aujourdhui(), j = (d.getDay() + 6) % 7; return plusJours(d, -j); }
+var BILAN = [['sacs', 'sac prêt', 'sacs prêts'], ['taches', 'tâche finie', 'tâches finies'], ['focus', 'séance de travail', 'séances de travail'],
+  ['consignes', 'consigne décodée', 'consignes décodées'], ['devoirs', 'devoir fait', 'devoirs faits'], ['etapes', 'étape cochée', 'étapes cochées'], ['pauses', 'pause', 'pauses']];
+function bilanSemaine() {
+  var d0 = isoJour(debutSemaine()), c = {}, out = [];
+  S.journal.forEach(function (e) { if (e.d >= d0) c[e.k] = (c[e.k] || 0) + 1; });
+  BILAN.forEach(function (b) { if (c[b[0]]) out.push(c[b[0]] + ' ' + (c[b[0]] > 1 ? b[2] : b[1])); });
+  return out;
+}
+function collection() {
+  var n = 0;
+  AUTOCOLLANTS.forEach(function (a) { if (S.collants[a.id]) n++; });
+  var g = h('div', { 'class': 'collants' });
+  AUTOCOLLANTS.forEach(function (a) {
+    var ok = !!S.collants[a.id], fait = Math.min(S.stats[a.k] || 0, a.n);
+    g.appendChild(h('button', { 'class': 'collant' + (ok ? '' : ' verrou'), type: 'button', 'aria-label': ok ? a.nom : 'À gagner : ' + a.d,
+      onclick: function () { toast(ok ? a.nom + ' : ' + minusc(a.d) + '.' : 'Pour le gagner : ' + minusc(a.d) + ' (' + fait + ' / ' + a.n + ').'); } },
+      h('span', { html: svgCollant(a, ok) }),
+      h('small', null, ok ? a.nom : fait + ' / ' + a.n)));
+  });
+  return [h('div', { 'class': 'section-titre' }, 'Mes autocollants', h('span', { 'class': 'compte' }, n + ' / ' + AUTOCOLLANTS.length)),
+    h('p', { 'class': 'aide', style: 'margin-top:-6px' }, 'Ils se gagnent en utilisant tes outils. Ce que tu gagnes, tu le gardes pour toujours.'), g];
+}
+
+/* =========================================================
+   Mode « Je travaille »
+   ========================================================= */
+var verrouEcran = null;
+function garderEcran(on) {
+  try {
+    if (on && navigator.wakeLock && !verrouEcran) navigator.wakeLock.request('screen').then(function (v) { verrouEcran = v; })['catch'](function () { });
+    if (!on && verrouEcran) { verrouEcran.release(); verrouEcran = null; }
+  } catch (e) { }
+}
+function anneauSVG() {
+  return '<svg class="anneau" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="#fff" stroke="#1D1B2E" stroke-width="4"/>' +
+    '<circle cx="60" cy="60" r="42" fill="none" stroke="#EFE6D6" stroke-width="12"/>' +
+    '<circle class="anneau-p" cx="60" cy="60" r="42" fill="none" stroke="#FF6B57" stroke-width="12" stroke-linecap="round" transform="rotate(-90 60 60)" stroke-dasharray="263.9" stroke-dashoffset="0"/>' +
+    '<text class="anneau-t" x="60" y="68" text-anchor="middle" font-family="Fredoka,Lexend,sans-serif" font-weight="700" font-size="24" fill="#1D1B2E"></text></svg>';
+}
+function rFocus() {
+  quitter(); outilCourant = 'focus';
+  couleurOutil('#A6DDF7', true);
+  barre('outil', 'Je travaille', { ic: 'lire' });
+  var sh = feuille(), F = S.focus;
+  function taches() { return S.etapes.list.filter(function (t) { return t.steps.length && t.i < t.steps.length; }); }
+  function tacheF() { return F.tache ? trouve(S.etapes.list, function (t) { return t.id === F.tache && t.i < t.steps.length; }) : null; }
+  function compterSeance() { if (!F.compte) { F.compte = true; sauver(); compter('focus'); } }
+  function dessiner() { vider(sh); Chrono.vue = null; Chrono.surFin = null; if (F.actif) travail(); else choisir(); }
+  function choisir() {
+    garderEcran(false);
+    var sel = F.tache && trouve(taches(), function (t) { return t.id === F.tache; }) ? F.tache : '', duree = F.duree || 15;
+    var liste = h('div');
+    var label = h('input', { type: 'text', placeholder: 'Exemple : exercice 3 de maths', value: F.label || '', 'aria-label': 'Sur quoi tu travailles' });
+    var zoneLabel = h('div', null, h('label', { 'class': 'lab' }, 'Ou écris juste sur quoi tu travailles :'), label);
+    function rendreListe() {
+      vider(liste);
+      var ts = taches();
+      ts.forEach(function (t) {
+        liste.appendChild(h('button', { 'class': 'choix-tache' + (sel === t.id ? ' on' : ''), type: 'button', 'aria-pressed': sel === t.id ? 'true' : 'false', onclick: function () { sel = sel === t.id ? '' : t.id; rendreListe(); } },
+          h('span', { 'class': 'case' }, ico('coche')),
+          h('span', null, h('b', null, t.titre), h('br'), h('small', null, 'Étape ' + (t.i + 1) + ' sur ' + t.steps.length))));
+      });
+      if (!ts.length) liste.appendChild(h('p', { 'class': 'aide' }, 'Pas de tâche en cours. Tu peux en créer une dans « Étapes », ou juste écrire sur quoi tu travailles.'));
+      zoneLabel.hidden = !!sel;
+    }
+    var durees = h('div', { 'class': 'rang' });
+    function rendreDurees() {
+      vider(durees);
+      [5, 10, 15, 20, 25].forEach(function (m) { durees.appendChild(h('button', { 'class': 'puce' + (m === duree ? ' on' : ''), type: 'button', onclick: function () { duree = m; rendreDurees(); } }, m + ' min')); });
+    }
+    rendreDurees();
+    ajoute(sh, [
+      h('div', { 'class': 'titre' }, 'Je me mets au travail'),
+      h('p', { 'class': 'aide' }, 'Un seul écran, une seule chose à faire à la fois. Le temps défile dans l’anneau, sans pression.'),
+      h('div', { 'class': 'titre' }, 'Ma tâche'), liste, zoneLabel,
+      h('div', { 'class': 'titre' }, 'Combien de temps ?'), durees,
+      h('div', { 'class': 'rang', style: 'margin-top:22px' },
+        btn('C’est parti', 'lire', function () {
+          F.actif = true; F.tache = sel; F.label = sel ? '' : label.value.trim(); F.duree = duree; F.faites = 0; F.compte = false; sauver();
+          Chrono.phase = 'travail'; Chrono.dureeMs = Chrono.resteMs = duree * 60000; Chrono.demarrer(); dessiner();
+        }, 'prim gros'),
+        btn('Créer une tâche en étapes', 'plus', function () { aller('etapes'); }))
+    ]);
+    rendreListe();
+  }
+  function travail() {
+    var t = tacheF();
+    if (F.tache && !t) { F.tache = ''; sauver(); }
+    var an = h('div', { html: anneauSVG() }), prog = an.querySelector('.anneau-p'), txt = an.querySelector('.anneau-t');
+    var msg = h('div', { 'aria-live': 'polite' });
+    function vue() {
+      var p = Chrono.dureeMs ? Chrono.resteMs / Chrono.dureeMs : 0;
+      prog.setAttribute('stroke-dashoffset', (263.9 * (1 - p)).toFixed(1));
+      prog.setAttribute('stroke', Chrono.phase === 'repos' ? '#3DB36B' : '#FF6B57');
+      txt.textContent = mmss(Chrono.resteMs);
+    }
+    Chrono.vue = vue; vue();
+    function relancer(min, phase) { vider(msg); Chrono.phase = phase; Chrono.dureeMs = Chrono.resteMs = min * 60000; Chrono.sonne = false; Chrono.demarrer(); dessiner(); }
+    Chrono.surFin = function (phaseFinie) {
+      vider(msg);
+      if (phaseFinie === 'repos') {
+        msg.appendChild(h('div', { 'class': 'carte-item' }, h('div', { 'class': 'lisible', style: 'font-weight:600' }, 'La pause est finie. On reprend ?'),
+          h('div', { 'class': 'rang' }, btn('Reprendre ' + F.duree + ' min', 'lire', function () { relancer(F.duree, 'travail'); }, 'prim'), btn('J’arrête là', 'stop', terminer))));
+        return;
+      }
+      compterSeance();
+      msg.appendChild(h('div', { 'class': 'carte-item' }, h('div', { 'class': 'lisible', style: 'font-weight:600' }, 'Le temps est écoulé. Bravo pour ta concentration !'),
+        h('div', { 'class': 'rang' },
+          btn('Pause de 3 min', 'pause', function () { relancer(3, 'repos'); }, 'prim'),
+          btn('Encore 10 min', 'reprendre', function () { relancer(10, 'travail'); }),
+          btn('J’arrête là', 'stop', terminer))));
+    };
+    var corps;
+    if (t) {
+      var s = t.steps[t.i];
+      corps = [
+        h('div', { 'class': 'compteur' }, t.titre + ' · étape ' + (t.i + 1) + ' sur ' + t.steps.length),
+        h('div', { 'class': 'etape-txt lisible' }, s.t),
+        h('div', { 'class': 'rang', style: 'justify-content:center' }, btn('C’est fait', 'coche', function () {
+          s.f = true; F.faites++; sonner('etape');
+          var k = indexDe(t.steps, function (x) { return !x.f; });
+          t.i = k < 0 ? t.steps.length : k; sauver(); compter('etapes');
+          if (k < 0) { compter('taches'); terminer(); } else dessiner();
+        }, 'prim gros'))];
+    } else {
+      corps = [
+        h('div', { 'class': 'compteur' }, 'Je travaille sur'),
+        h('div', { 'class': 'etape-txt lisible' }, F.label || 'Mon travail'),
+        h('div', { 'class': 'rang', style: 'justify-content:center' }, btn('J’ai fini !', 'coche', terminer, 'prim gros'))];
+    }
+    var aideZ = h('div', { hidden: true, 'class': 'carte-item', style: 'text-align:left' },
+      h('b', null, 'Tu bloques ? Essaie une de ces pistes :'),
+      h('div', { 'class': 'rang' },
+        btn('Relire la consigne avec le Décodeur', 'consignes', function () { aller('consignes'); }, 'petit'),
+        btn('Une pause d’une minute', 'pause', function () { aller('pause'); }, 'petit'),
+        t ? btn('Découper cette étape en plus petit', 'crayon', function () { S.etapes.active = t.id; sauver(); aller('etapes'); }, 'petit') : null),
+      h('p', { 'class': 'aide', style: 'margin:8px 0 0' }, 'Tu peux aussi lever la main : demander de l’aide, c’est une stratégie.'));
+    ajoute(sh, h('div', { 'class': 'focus-zone' },
+      h('div', { 'class': 'focus-top' }, an,
+        h('div', { 'class': 'focus-ctrl' },
+          btn(Chrono.marche ? 'Pause' : 'Reprendre', Chrono.marche ? 'pausebtn' : 'lire', function () { if (Chrono.marche) Chrono.pause(); else Chrono.demarrer(); dessiner(); }, 'petit'),
+          btn('+5 min', 'plus', function () { Chrono.resteMs += 300000; Chrono.dureeMs += 300000; if (Chrono.marche) Chrono.fin += 300000; vue(); }, 'petit'))),
+      msg, corps,
+      h('div', { 'class': 'rang', style: 'justify-content:center;margin-top:24px' },
+        t ? btn('Écouter l’étape', 'lecteur', function () { TTS.dire(t.steps[t.i].t, 'fr'); }, 'petit') : null,
+        btn('Je bloque', 'bulle', function () { aideZ.hidden = !aideZ.hidden; }, 'petit'),
+        btn('Arrêter la séance', 'stop', function () { F.actif = false; sauver(); Chrono.reinit(); dessiner(); }, 'petit')),
+      aideZ));
+    garderEcran(true);
+  }
+  function terminer() {
+    Chrono.surFin = null; Chrono.vue = null; Chrono.reinit();
+    compterSeance();
+    F.actif = false; sauver(); garderEcran(false);
+    vider(sh); confettis(); sonner('fin');
+    ajoute(sh, h('div', { 'class': 'focus' },
+      h('div', { 'class': 'compteur' }, 'Séance terminée'),
+      h('div', { 'class': 'etape-txt lisible' }, F.faites ? 'Bravo ! ' + F.faites + ' étape' + (F.faites > 1 ? 's' : '') + ' faite' + (F.faites > 1 ? 's' : '') + ' pendant cette séance.' : 'Bravo, tu es allé·e au bout de ta séance !'),
+      h('div', { 'class': 'rang', style: 'justify-content:center' },
+        btn('Retour à l’accueil', 'retour', function () { aller(''); }, 'prim gros'),
+        btn('Nouvelle séance', 'reprendre', function () { F.compte = false; dessiner(); }))));
+  }
+  dessiner();
+}
+
+/* =========================================================
+   QR code (encodeur maison, sans bibliothèque : octets, niveaux M puis L)
+   ========================================================= */
+var QR = (function () {
+  var ECC = [
+    [-1, 7, 10, 15, 20, 26, 18, 20, 24, 30, 18, 20, 24, 26, 30, 22, 24, 28, 30, 28, 28, 28, 28, 30, 30, 26, 28, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30],
+    [-1, 10, 16, 26, 18, 24, 16, 18, 22, 22, 26, 30, 22, 22, 24, 24, 28, 28, 26, 26, 26, 26, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]
+  ];
+  var BLOCS = [
+    [-1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 4, 4, 4, 4, 4, 6, 6, 6, 6, 7, 8, 8, 9, 9, 10, 12, 12, 12, 13, 14, 15, 16, 17, 18, 19, 19, 20, 21, 22, 24, 25],
+    [-1, 1, 1, 1, 2, 2, 4, 4, 4, 5, 5, 5, 8, 9, 9, 10, 10, 11, 13, 14, 16, 17, 17, 18, 20, 21, 23, 25, 26, 28, 29, 31, 33, 35, 37, 38, 40, 43, 45, 47, 49]
+  ];
+  var FMT = [1, 0];
+  function rawModules(v) { var r = (16 * v + 128) * v + 64; if (v >= 2) { var na = Math.floor(v / 7) + 2; r -= (25 * na - 10) * na - 55; if (v >= 7) r -= 36; } return r; }
+  function dataCodewords(v, e) { return Math.floor(rawModules(v) / 8) - ECC[e][v] * BLOCS[e][v]; }
+  function mul(x, y) { var z = 0, i; for (i = 7; i >= 0; i--) { z = ((z << 1) ^ ((z >>> 7) * 0x11D)) & 0xFF; z ^= ((y >>> i) & 1) * x; } return z; }
+  function diviseur(deg) {
+    var r = [], i, j, root = 1;
+    for (i = 0; i < deg - 1; i++) r.push(0);
+    r.push(1);
+    for (i = 0; i < deg; i++) { for (j = 0; j < r.length; j++) { r[j] = mul(r[j], root); if (j + 1 < r.length) r[j] ^= r[j + 1]; } root = mul(root, 2); }
+    return r;
+  }
+  function reste(data, div) {
+    var r = div.map(function () { return 0; });
+    data.forEach(function (b) { var f = b ^ r.shift(); r.push(0); for (var i = 0; i < div.length; i++) r[i] ^= mul(div[i], f); });
+    return r;
+  }
+  function bit(x, i) { return ((x >>> i) & 1) !== 0; }
+  function alignPos(v) {
+    if (v === 1) return [];
+    var n = Math.floor(v / 7) + 2, size = v * 4 + 17, pas = Math.floor((v * 8 + n * 3 + 5) / (n * 4 - 4)) * 2, r = [], i, pos;
+    for (i = 0, pos = size - 7; i < n - 1; i++, pos -= pas) r.unshift(pos);
+    r.unshift(6);
+    return r;
+  }
+  function version(n, e) {
+    for (var v = 1; v <= 40; v++) if (4 + (v < 10 ? 8 : 16) + n * 8 <= dataCodewords(v, e) * 8) return v;
+    return 0;
+  }
+  function encoder(texte) {
+    var octets = [], s = unescape(encodeURIComponent(texte)), i, j, k, e = 1, v;
+    for (i = 0; i < s.length; i++) octets.push(s.charCodeAt(i));
+    v = version(octets.length, 1);
+    if (!v) { e = 0; v = version(octets.length, 0); }
+    if (!v) return null;
+    var bits = [], cap = dataCodewords(v, e) * 8;
+    function mettre(val, n) { for (var q = n - 1; q >= 0; q--) bits.push((val >>> q) & 1); }
+    mettre(4, 4); mettre(octets.length, v < 10 ? 8 : 16);
+    octets.forEach(function (b) { mettre(b, 8); });
+    mettre(0, Math.min(4, cap - bits.length));
+    mettre(0, (8 - bits.length % 8) % 8);
+    for (var pad = 0xEC; bits.length < cap; pad ^= 0xEC ^ 0x11) mettre(pad, 8);
+    var data = [];
+    for (i = 0; i < bits.length; i += 8) { var b = 0; for (k = 0; k < 8; k++) b = (b << 1) | bits[i + k]; data.push(b); }
+    var nb = BLOCS[e][v], el = ECC[e][v], raw = Math.floor(rawModules(v) / 8), nCourts = nb - raw % nb, lenCourt = Math.floor(raw / nb), dv = diviseur(el), blocs = [], pos = 0;
+    for (i = 0; i < nb; i++) {
+      var dat = data.slice(pos, pos + lenCourt - el + (i < nCourts ? 0 : 1)); pos += dat.length;
+      var ec = reste(dat, dv); if (i < nCourts) dat.push(0);
+      blocs.push(dat.concat(ec));
+    }
+    var cw = [];
+    for (i = 0; i < blocs[0].length; i++) for (j = 0; j < blocs.length; j++) if (i !== lenCourt - el || j >= nCourts) cw.push(blocs[j][i]);
+    var size = v * 4 + 17, M = [], Fx = [];
+    for (i = 0; i < size; i++) { M.push([]); Fx.push([]); for (j = 0; j < size; j++) { M[i].push(false); Fx[i].push(false); } }
+    function fixe(x, y, d) { M[y][x] = d; Fx[y][x] = true; }
+    for (i = 0; i < size; i++) { fixe(6, i, i % 2 === 0); fixe(i, 6, i % 2 === 0); }
+    function chercheur(cx, cy) {
+      for (var dy = -4; dy <= 4; dy++) for (var dx = -4; dx <= 4; dx++) {
+        var d = Math.max(Math.abs(dx), Math.abs(dy)), x = cx + dx, y = cy + dy;
+        if (x >= 0 && x < size && y >= 0 && y < size) fixe(x, y, d !== 2 && d !== 4);
+      }
+    }
+    chercheur(3, 3); chercheur(size - 4, 3); chercheur(3, size - 4);
+    var ap = alignPos(v), na = ap.length;
+    for (i = 0; i < na; i++) for (j = 0; j < na; j++) {
+      if ((i === 0 && j === 0) || (i === 0 && j === na - 1) || (i === na - 1 && j === 0)) continue;
+      for (var ay = -2; ay <= 2; ay++) for (var ax = -2; ax <= 2; ax++) fixe(ap[i] + ax, ap[j] + ay, Math.max(Math.abs(ax), Math.abs(ay)) !== 1);
+    }
+    function format(mask) {
+      var d = FMT[e] << 3 | mask, r = d, q;
+      for (q = 0; q < 10; q++) r = (r << 1) ^ ((r >>> 9) * 0x537);
+      var fb = (d << 10 | r) ^ 0x5412;
+      for (q = 0; q <= 5; q++) fixe(8, q, bit(fb, q));
+      fixe(8, 7, bit(fb, 6)); fixe(8, 8, bit(fb, 7)); fixe(7, 8, bit(fb, 8));
+      for (q = 9; q < 15; q++) fixe(14 - q, 8, bit(fb, q));
+      for (q = 0; q < 8; q++) fixe(size - 1 - q, 8, bit(fb, q));
+      for (q = 8; q < 15; q++) fixe(8, size - 15 + q, bit(fb, q));
+      fixe(8, size - 8, true);
+    }
+    format(0);
+    if (v >= 7) {
+      var r2 = v;
+      for (k = 0; k < 12; k++) r2 = (r2 << 1) ^ ((r2 >>> 11) * 0x1F25);
+      var vb = v << 12 | r2;
+      for (k = 0; k < 18; k++) { var bb = bit(vb, k), a = size - 11 + k % 3, c = Math.floor(k / 3); fixe(a, c, bb); fixe(c, a, bb); }
+    }
+    var idx = 0;
+    for (var droite = size - 1; droite >= 1; droite -= 2) {
+      if (droite === 6) droite = 5;
+      for (var vert = 0; vert < size; vert++) for (j = 0; j < 2; j++) {
+        var x = droite - j, monte = ((droite + 1) & 2) === 0, y = monte ? size - 1 - vert : vert;
+        if (!Fx[y][x] && idx < cw.length * 8) { M[y][x] = bit(cw[idx >>> 3], 7 - (idx & 7)); idx++; }
+      }
+    }
+    function masquer(m) {
+      for (var yy = 0; yy < size; yy++) for (var xx = 0; xx < size; xx++) {
+        if (Fx[yy][xx]) continue;
+        var inv;
+        switch (m) {
+          case 0: inv = (xx + yy) % 2 === 0; break;
+          case 1: inv = yy % 2 === 0; break;
+          case 2: inv = xx % 3 === 0; break;
+          case 3: inv = (xx + yy) % 3 === 0; break;
+          case 4: inv = (Math.floor(xx / 3) + Math.floor(yy / 2)) % 2 === 0; break;
+          case 5: inv = xx * yy % 2 + xx * yy % 3 === 0; break;
+          case 6: inv = (xx * yy % 2 + xx * yy % 3) % 2 === 0; break;
+          default: inv = ((xx + yy) % 2 + xx * yy % 3) % 2 === 0;
+        }
+        if (inv) M[yy][xx] = !M[yy][xx];
+      }
+    }
+    function penalite() {
+      var p = 0, yy, xx, run, sombre = 0;
+      for (yy = 0; yy < size; yy++) { run = 1; for (xx = 1; xx < size; xx++) { if (M[yy][xx] === M[yy][xx - 1]) { run++; if (run === 5) p += 3; else if (run > 5) p++; } else run = 1; } }
+      for (xx = 0; xx < size; xx++) { run = 1; for (yy = 1; yy < size; yy++) { if (M[yy][xx] === M[yy - 1][xx]) { run++; if (run === 5) p += 3; else if (run > 5) p++; } else run = 1; } }
+      for (yy = 0; yy < size - 1; yy++) for (xx = 0; xx < size - 1; xx++) { var cc = M[yy][xx]; if (cc === M[yy][xx + 1] && cc === M[yy + 1][xx] && cc === M[yy + 1][xx + 1]) p += 3; }
+      for (yy = 0; yy < size; yy++) for (xx = 0; xx < size; xx++) if (M[yy][xx]) sombre++;
+      p += Math.floor(Math.abs(sombre * 20 - size * size * 10) / (size * size)) * 10;
+      return p;
+    }
+    var meilleur = 0, minP = Infinity;
+    for (var m = 0; m < 8; m++) { masquer(m); format(m); var pp = penalite(); if (pp < minP) { minP = pp; meilleur = m; } masquer(m); }
+    masquer(meilleur); format(meilleur);
+    return { size: size, m: M, v: v };
+  }
+  function svg(texte) {
+    var q = encoder(texte);
+    if (!q) return null;
+    var n = q.size + 8, d = '', y, x;
+    for (y = 0; y < q.size; y++) for (x = 0; x < q.size; x++) if (q.m[y][x]) d += 'M' + (x + 4) + ',' + (y + 4) + 'h1v1h-1z';
+    return { v: q.v, svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + n + ' ' + n + '" shape-rendering="crispEdges"><rect width="' + n + '" height="' + n + '" fill="#fff"/><path d="' + d + '" fill="#000"/></svg>' };
+  }
+  return { svg: svg };
+})();
+
+/* =========================================================
+   Liens prof : tout est dans le lien, rien n'est envoyé sur un serveur
+   ========================================================= */
+function versBase64(str) { return window.btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function depuisBase64(b) { b = b.replace(/-/g, '+').replace(/_/g, '/'); while (b.length % 4) b += '='; return decodeURIComponent(escape(window.atob(b))); }
+function baseURL() { return location.href.split('#')[0]; }
+function effacerHash() { try { history.replaceState(null, '', baseURL()); } catch (e) { } }
+function copier(txt, champ) {
+  function secours() { try { champ.focus(); champ.select(); document.execCommand('copy'); toast('Lien copié.'); } catch (e) { toast('Sélectionne le lien et copie-le (Ctrl + C).'); } }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { toast('Lien copié.'); }, secours);
+  else secours();
+}
+function rProf() {
+  quitter(); outilCourant = 'prof';
+  couleurOutil('#FFD3A8', true);
+  barre('outil', 'Espace prof', { ic: 'carte' });
+  var sh = feuille(), P = S.prof, sortie = h('div');
+  function bloc(titre, cle, aide, contenu) {
+    var z = h('div', { hidden: !P[cle].on }, contenu);
+    return h('div', { 'class': 'carte-item' },
+      h('div', { 'class': 'titre', style: 'margin:0 0 4px' }, titre),
+      h('p', { 'class': 'aide', style: 'margin:0 0 6px' }, aide),
+      bascule('Ajouter au lien', P[cle].on, function (on) { P[cle].on = on; sauver(); z.hidden = !on; }), z);
+  }
+  function champ(obj, cle, ph, zone) {
+    var e = zone ? h('textarea', { rows: '4', value: obj[cle], placeholder: ph, 'aria-label': ph }) : h('input', { type: 'text', value: obj[cle], placeholder: ph, 'aria-label': ph });
+    e.addEventListener('input', function () { obj[cle] = e.value; sauver(); });
+    return e;
+  }
+  var edt = h('div');
+  JOURS_ECOLE.forEach(function (j) {
+    var liste = P.edt.jours[j[0]] || (P.edt.jours[j[0]] = []), r = h('div', { 'class': 'rang', style: 'margin:6px 0' });
+    MATIERES_DEF.forEach(function (m) {
+      var on = liste.indexOf(m.nom) >= 0;
+      var b = h('button', { 'class': 'puce' + (on ? ' on' : ''), type: 'button', onclick: function () {
+        var k = liste.indexOf(m.nom); if (k < 0) liste.push(m.nom); else liste.splice(k, 1); sauver();
+        b.className = 'puce' + (k < 0 ? ' on' : '');
+      } }, h('span', { 'class': 'pastille', style: 'background:' + m.c }), m.nom);
+      r.appendChild(b);
+    });
+    edt.appendChild(h('div', null, h('b', { style: 'text-transform:capitalize' }, JOURS[+j[0]]), r));
+  });
+  var selMat = h('select', { 'aria-label': 'Matière', onchange: function () { P.dev.m = selMat.value; sauver(); } });
+  MATIERES_DEF.forEach(function (m) { var o = h('option', { value: m.nom }, m.nom); if (m.nom === P.dev.m) o.selected = true; selMat.appendChild(o); });
+  var date = h('input', { type: 'date', value: P.dev.p || '', 'aria-label': 'Pour quand', onchange: function () { P.dev.p = date.value; sauver(); } });
+  function paquet() {
+    var d = { v: 1 }, j;
+    if (P.edt.on) {
+      var noms = {}, total = 0;
+      for (j in P.edt.jours) if (P.edt.jours.hasOwnProperty(j)) P.edt.jours[j].forEach(function (n) { noms[n] = 1; total++; });
+      if (total) {
+        d.edt = P.edt.jours;
+        d.mats = MATIERES_DEF.filter(function (m) { return noms[m.nom]; }).map(function (m) { return { n: m.nom, c: m.c, i: m.items }; });
+      }
+    }
+    if (P.txt.on && P.txt.t.trim()) d.txt = { t: P.txt.t.trim(), l: P.txt.l };
+    if (P.cons.on && P.cons.t.trim()) d.cons = P.cons.t.trim();
+    if (P.tache.on && P.tache.s.trim()) d.tache = { t: P.tache.t.trim() || 'Tâche du prof', s: P.tache.s.split('\n').map(function (x) { return x.trim(); }).filter(function (x) { return !!x; }) };
+    if (P.dev.on && P.dev.q.trim()) d.dev = { m: P.dev.m, q: P.dev.q.trim(), p: P.dev.p };
+    if (P.fiche.on && P.fiche.t.trim()) d.fiche = { t: P.fiche.t.trim(), x: P.fiche.x };
+    return d;
+  }
+  function creer() {
+    vider(sortie);
+    var d = paquet(), n = 0, k;
+    for (k in d) if (d.hasOwnProperty(k) && k !== 'v' && k !== 'mats') n++;
+    if (!n) { toast('Active et remplis au moins un élément.'); return; }
+    var url = baseURL() + '#import=' + versBase64(JSON.stringify(d));
+    var champLien = h('input', { type: 'text', value: url, readonly: true, 'aria-label': 'Lien à partager', onclick: function () { champLien.select(); } });
+    var qr = QR.svg(url), zq = h('div', { 'class': 'qr' });
+    if (qr) {
+      zq.innerHTML = qr.svg;
+      if (qr.v > 15) zq.appendChild(h('p', { 'class': 'note' }, 'Le contenu est long : le QR code est très dense et peut être difficile à scanner de loin. Raccourcis le texte, ou partage plutôt le lien (ENT, Pronote…).'));
+    } else zq.appendChild(h('div', { 'class': 'alerte' }, 'Trop de contenu pour tenir dans un QR code. Le lien fonctionne quand même : partage-le par l’ENT ou Pronote.'));
+    ajoute(sortie, [
+      h('div', { 'class': 'titre' }, 'Ton lien est prêt'),
+      h('p', { 'class': 'aide' }, 'Quand un élève l’ouvre, son Dyspositif lui propose d’ajouter ce contenu. Rien n’est stocké ailleurs : tout est dans le lien.'),
+      champLien,
+      h('div', { 'class': 'rang' },
+        btn('Copier le lien', 'telecharger', function () { copier(url, champLien); }, 'prim'),
+        h('a', { 'class': 'btn', href: url, target: '_blank', rel: 'noopener' }, ico('oeil'), 'Tester'),
+        qr ? btn('Télécharger le QR code', 'telecharger', function () {
+          var blob = new Blob([qr.svg], { type: 'image/svg+xml' }), a = h('a', { href: URL.createObjectURL(blob), download: 'dyspositif-qr.svg' });
+          document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.parentNode.removeChild(a); }, 500);
+        }) : null),
+      zq
+    ]);
+    sortie.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  ajoute(sh, [
+    h('p', { 'class': 'aide' }, 'Prépare un lien (et son QR code) pour ta classe : les élèves l’ouvrent et leur Dyspositif est pré-rempli. Ils n’ont rien à recopier.'),
+    bloc('Emploi du temps de la classe', 'edt', 'Pour que chaque élève prépare son sac sans rien saisir.', edt),
+    bloc('Un texte à écouter', 'txt', 'Il s’ouvrira dans le Lecteur, prêt à être écouté.', [
+      h('div', { 'class': 'rang' }, choix([['fr', 'Français'], ['en', 'English']], P.txt.l, function (l) { P.txt.l = l; sauver(); })),
+      champ(P.txt, 't', 'Colle le texte ici…', true)]),
+    bloc('Une consigne', 'cons', 'Elle s’ouvrira dans le Décodeur de consignes.', champ(P.cons, 't', 'La consigne…', true)),
+    bloc('Une tâche découpée en étapes', 'tache', 'Une étape par ligne. Elle s’ouvrira dans Étapes et dans « Je travaille ».', [
+      champ(P.tache, 't', 'Nom de la tâche (ex. : Préparer l’oral)'), h('div', { style: 'height:8px' }),
+      champ(P.tache, 's', 'Étape 1\nÉtape 2\nÉtape 3…', true)]),
+    bloc('Un devoir', 'dev', 'Il s’ajoutera dans les Devoirs de l’élève.', [selMat, h('div', { style: 'height:8px' }), champ(P.dev, 'q', 'Le devoir (ex. : exercice 4 page 52)', true), h('label', { 'class': 'lab' }, 'Pour le'), date]),
+    bloc('Une fiche outil', 'fiche', 'Elle s’ajoutera dans les Aides de l’élève.', [champ(P.fiche, 't', 'Titre de la fiche'), h('div', { style: 'height:8px' }), champ(P.fiche, 'x', 'La règle, l’astuce, un exemple…', true)]),
+    h('div', { 'class': 'rang', style: 'margin-top:20px' }, btn('Créer le lien et le QR code', 'plus', creer, 'prim gros')),
+    sortie
+  ]);
+}
+function appliquerImport(d) {
+  var premier = null;
+  function monter(id) { if (S.lames.indexOf(id) < 0) S.lames.push(id); if (S.lamesProf.indexOf(id) < 0) S.lamesProf.push(id); if (!premier) premier = id; }
+  function matNom(n) { return trouve(S.sac.matieres, function (x) { return x.nom.toLowerCase() === String(n).toLowerCase(); }); }
+  if (d.edt) {
+    (d.mats || []).forEach(function (m) { if (!matNom(m.n)) S.sac.matieres.push({ id: uid(), nom: String(m.n), c: m.c || '#8A8F96', items: (m.i || []).map(String) }); });
+    for (var j in d.edt) {
+      if (d.edt.hasOwnProperty(j) && S.sac.edt[j] !== undefined && d.edt[j].map) {
+        S.sac.edt[j] = d.edt[j].map(function (n) { var m = matNom(n); return m ? m.id : null; }).filter(function (x) { return !!x; });
+      }
+    }
+    monter('sac');
+  }
+  if (d.txt) { S.lecteur.texte = String(d.txt.t); S.lecteur.lang = d.txt.l === 'en' ? 'en' : 'fr'; monter('lecteur'); }
+  if (d.cons) { S.consigne = String(d.cons); monter('consignes'); }
+  if (d.tache && d.tache.s && d.tache.s.length) {
+    var t = { id: uid(), titre: String(d.tache.t), steps: d.tache.s.map(function (x) { return { t: String(x), f: false }; }), i: 0 };
+    S.etapes.list.unshift(t); S.etapes.active = t.id; monter('etapes');
+  }
+  if (d.dev) {
+    var m = matNom(d.dev.m);
+    S.devoirs.push({ id: uid(), mat: m ? m.id : '', quoi: String(d.dev.q), pour: /^\d{4}-\d{2}-\d{2}$/.test(d.dev.p || '') ? d.dev.p : isoJour(jourEcoleSuivant()), taille: 'moyen', fait: false });
+    monter('devoirs');
+  }
+  if (d.fiche) { S.fiches.push({ id: uid(), titre: String(d.fiche.t), txt: String(d.fiche.x || ''), c: '#FFB38A' }); monter('aides'); }
+  sauver();
+  return premier;
+}
+function rImport(code) {
+  quitter(); outilCourant = 'import';
+  couleurOutil('#FFD3A8', true);
+  barre('outil', 'Message du prof', { ic: 'carte' });
+  var sh = feuille(), d = null;
+  try { d = JSON.parse(depuisBase64(code)); } catch (e) { d = null; }
+  if (!d || d.v !== 1) {
+    ajoute(sh, [h('div', { 'class': 'alerte' }, 'Ce lien est abîmé ou incomplet. Demande à ton prof de te le renvoyer.'),
+      h('div', { 'class': 'rang' }, btn('Aller à l’accueil', 'retour', function () { effacerHash(); accueil(); }, 'prim'))]);
+    return;
+  }
+  var items = [];
+  if (d.edt) items.push(['sac', 'L’emploi du temps de la classe, pour préparer ton sac']);
+  if (d.txt) items.push(['lecteur', 'Un texte à écouter']);
+  if (d.cons) items.push(['consignes', 'Une consigne à décoder']);
+  if (d.tache) items.push(['etapes', 'Une tâche découpée en étapes : « ' + d.tache.t + ' »']);
+  if (d.dev) items.push(['devoirs', 'Un devoir de ' + d.dev.m + ' : ' + String(d.dev.q).slice(0, 70)]);
+  if (d.fiche) items.push(['aides', 'Une fiche outil : « ' + d.fiche.t + ' »']);
+  var l = h('div');
+  items.forEach(function (it) {
+    var o = outil(it[0]);
+    l.appendChild(h('div', { 'class': 'ligne-lame', style: '--t:' + o.c }, h('span', { 'class': 'rond' }, ico(o.ic)), h('div', { 'class': 'grow' }, h('b', null, o.nom), h('small', null, it[1]))));
+  });
+  ajoute(sh, [
+    h('div', { 'class': 'titre' }, 'Ton prof t’envoie :'), l,
+    h('p', { 'class': 'aide' }, d.edt ? 'Attention : ton emploi du temps actuel sera remplacé par celui de la classe.' : ''),
+    h('div', { 'class': 'rang', style: 'margin-top:18px' },
+      btn('Ajouter à mon Dyspositif', 'coche', function () {
+        var premier = appliquerImport(d);
+        effacerHash(); confettis();
+        if (!S.monte) { toast('C’est ajouté ! Monte d’abord ton Dyspositif.'); accueil(); }
+        else { toast('C’est ajouté !'); aller(premier || ''); }
+      }, 'prim gros'),
+      btn('Non merci', null, function () { effacerHash(); accueil(); }))
   ]);
 }
 
@@ -2283,6 +2896,10 @@ function rAtelier() {
     h('div', { 'class': 'titre' }, 'Gravure'), grav,
     h('div', { 'class': 'titre' }, 'Confort de lecture'), conf,
     h('div', { 'class': 'titre' }, 'Sons'), bascule('Petits sons (fin du sablier, étape faite)', S.sons, function (on) { S.sons = on; sauver(); }),
+    h('div', { 'class': 'titre' }, 'Fêtes'), bascule('Confettis quand je gagne un autocollant ou que je finis quelque chose', S.fetes, function (on) { S.fetes = on; sauver(); }),
+    h('div', { 'class': 'titre' }, 'Espace prof'),
+    h('p', { 'class': 'aide' }, 'Pour les enseignants : préparer un lien ou un QR code qui pré-remplit le Dyspositif des élèves (emploi du temps, texte, consigne, tâche, devoir, fiche).'),
+    h('div', { 'class': 'rang' }, btn('Ouvrir l’espace prof', 'carte', function () { aller('prof'); })),
     h('div', { 'class': 'titre' }, 'Sauvegarde'),
     h('p', { 'class': 'aide' }, 'Tout est enregistré sur cet appareil uniquement. Pour changer d’appareil, exporte une sauvegarde puis importe-la sur l’autre.'),
     h('div', { 'class': 'rang' },
